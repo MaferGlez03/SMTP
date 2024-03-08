@@ -1,0 +1,14 @@
+D:\UNI\3er año\1er Semestre\RC\Proyecto\bin\Debug\net8.0\Proyecto.exe
+D:\UNI\3er año\1er Semestre\RC\Proyecto\bin\Debug\net8.0\Proyecto.deps.json
+D:\UNI\3er año\1er Semestre\RC\Proyecto\bin\Debug\net8.0\Proyecto.runtimeconfig.json
+D:\UNI\3er año\1er Semestre\RC\Proyecto\bin\Debug\net8.0\Proyecto.dll
+D:\UNI\3er año\1er Semestre\RC\Proyecto\bin\Debug\net8.0\Proyecto.pdb
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.GeneratedMSBuildEditorConfig.editorconfig
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.AssemblyInfoInputs.cache
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.AssemblyInfo.cs
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.csproj.CoreCompileInputs.cache
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.dll
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\refint\Proyecto.dll
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.pdb
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\Proyecto.genruntimeconfig.cache
+D:\UNI\3er año\1er Semestre\RC\Proyecto\obj\Debug\net8.0\ref\Proyecto.dll
