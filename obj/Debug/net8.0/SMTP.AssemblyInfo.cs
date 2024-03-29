@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SMTP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5050d1732a0e5391994a0fef36bc43722596b8dd")]
 [assembly: System.Reflection.AssemblyProductAttribute("SMTP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SMTP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

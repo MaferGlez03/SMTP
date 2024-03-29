@@ -1,6 +1,5 @@
 using System.Net.Sockets;
 using System.Net;
-using SMTPClient;
 
 namespace program
 {
