@@ -7,10 +7,10 @@ namespace program
     {
         private TcpListener _listener;
         private bool _isRunning;
-        private List<Email> emails = new List<Email>();
+        public List<Email> emails = new List<Email>();
 
         // Variable para almacenar el correo electrónico
-        public Email LastEmail { get; private set; } = new Email { };
+        private Email LastEmail { get; set; } = new Email { };
 
         public SmtpServer()
         {
@@ -20,7 +20,6 @@ namespace program
 
         public void Start()
         {
-            Console.WriteLine("Start");
             _listener.Start();
             _isRunning = true;
 
@@ -52,7 +51,7 @@ namespace program
                         int emailNumber = int.Parse(line.Substring(5));
                         if (emails.Count > 0)
                         {
-                            Email email = emails[emailNumber];  // Suponiendo que "emails" es una lista de correos electrónicos
+                            Email email = emails[emailNumber]; 
 
                             writer.WriteLine(email.ToString());
                             writer.Flush();

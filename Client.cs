@@ -146,38 +146,40 @@ namespace program
     //Crear un Mailbox (Buzon de correo)
     public class Mailbox
     {
-        public List<Email> Emails { get; set; } = new List<Email>();
+        public List<Email> SendEmails { get; set; } = new List<Email>();
+        public List<Email> ReceivedEmails { get; set; } = new List<Email>();
+        public List<Email> DraftEmails { get; set; } = new List<Email>();
 
         //Ordenar por orden alfabetico segun el From de los correos
         public void SortByFrom()
         {
-            Emails = Emails.OrderBy(email => email.From).ToList();
+            ReceivedEmails = ReceivedEmails.OrderBy(email => email.From).ToList();
         }
 
         //Ordenar por orden alfabetico segun el Subject de los correos
         public void SortBySubject()
         {
-            Emails = Emails.OrderBy(email => email.Subject).ToList();
+            ReceivedEmails = ReceivedEmails.OrderBy(email => email.Subject).ToList();
         }
 
         //Ordenar por orden de llegada segun el Received de los correos
         public void SortByReceived()
         {
-            Emails = Emails.OrderBy(email => email.Received).ToList();
+            ReceivedEmails = ReceivedEmails.OrderBy(email => email.Received).ToList();
         }
 
         //Buscar un correo por una aparicion de subject (lo que se busca) en algun Subject
         //Se imprimen todos los correos que matcheen
         public List<Email> SearchBySubject(string subject)
         {
-            return Emails.Where(email => email.Subject.Contains(subject)).ToList();
+            return ReceivedEmails.Where(email => email.Subject.Contains(subject)).ToList();
         }
 
         //Buscar un correo por una aparicion de from (lo que se busca) en algun From
         //Se imprimen todos los correos que matcheen
         public List<Email> SearchByFrom(string from)
         {
-            return Emails.Where(email => email.From.Contains(from)).ToList();
+            return ReceivedEmails.Where(email => email.From.Contains(from)).ToList();
         }
 
         //Buscar un correo por una aparicion de received (lo que se busca) en algun Received
@@ -185,14 +187,14 @@ namespace program
         public List<Email> SearchByReceived(string received)
         {
             DateTime date = dateFormats(received);
-            return Emails.Where(email => email.Received.Date == date.Date).ToList();
+            return ReceivedEmails.Where(email => email.Received.Date == date.Date).ToList();
         }
 
         //Buscar un correo por una aparicion de content (lo que se busca) en algun Content
         //Se imprimen todos los correos que matcheen
         public List<Email> SearchByContent(string content)
         {
-            return Emails.Where(email => email.Content.Contains(content)).ToList();
+            return ReceivedEmails.Where(email => email.Content.Contains(content)).ToList();
         }
 
         public List<Email> SearchEverything(string search)
@@ -231,9 +233,9 @@ namespace program
 
         public void DeleteEmail(int index)
         {
-            if (index >= 0 && index < Emails.Count)
+            if (index >= 0 && index < ReceivedEmails.Count)
             {
-                Emails.RemoveAt(index);
+                ReceivedEmails.RemoveAt(index);
                 Console.WriteLine("Correo eliminado.");
             }
             else
