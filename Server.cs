@@ -99,7 +99,6 @@ namespace program
                             IsImportant = false
                         };
 
-                        LastEmail.Open();
                         writer.WriteLine("250 OK");
                     }
                     else if (line.StartsWith("QUIT"))

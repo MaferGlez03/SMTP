@@ -1,45 +1,4 @@
-﻿// namespace program
-// {
-//     public class Program
-//     {
-//         public static void Main()
-//         {
-//             // Crear el servidor SMTP
-//             SmtpServer server = new SmtpServer();
-//             Thread serverThread = new Thread(new ThreadStart(server.Start));
-//             serverThread.Start();
-
-//             // Crear los clientes
-//             Client client1 = new Client("client1@example.com");
-//             Client client2 = new Client("client2@example.com");
-
-//             // El cliente1 envía un correo electrónico al cliente2
-//             Email email = new Email
-//             {
-//                 From = "client1@example.com",
-//                 To = "client2@example.com",
-//                 Subject = "Hola",
-//                 Content = "lorem ipsum",
-//                 Received = DateTime.Now,
-//                 Unread = true,
-//                 HasAttachment = false,
-//                 IsImportant = false
-//             };
-
-
-//             client1.SendEmail(email);
-//             // El cliente2 recibe el correo electrónico
-//             Email receivedEmail = client2.ReceiveEmail(0);
-//             Console.WriteLine($"Received email: {receivedEmail.Content}");
-//             Console.ReadLine();
-//             // Detener el servidor
-//             server.Stop();
-//         }
-//     }
-// }
-
-using System;
-using program;
+﻿using program;
 
 class Program
 {
@@ -48,39 +7,21 @@ class Program
         // Crear una instancia del servidor SMTP
         SmtpServer server = new SmtpServer();
         List<Client> clients = new List<Client>();
-        bool serverStart = false;
         Client mainClient = null!;
+        string lastView = "";
+
+        Thread serverThread = new Thread(new ThreadStart(server.Start));
+        serverThread.Start();
+        Console.WriteLine("Servidor iniciado.");
 
         while (true)
         {
             Console.WriteLine("Ingrese un comando:");
             string command = Console.ReadLine()!;
 
-            if (command == "start server")
+            if (command.StartsWith("login "))
             {
-                if (serverStart)
-                {
-                    Console.WriteLine("Ya hay un server iniciado");
-                    continue;
-                }
-                serverStart = true;
-                Thread serverThread = new Thread(new ThreadStart(server.Start));
-                serverThread.Start();
-                Console.WriteLine("Servidor iniciado.");
-            }
-            else if (command == "stop server")
-            {
-                if (!serverStart)
-                {
-                    Console.WriteLine("No hay server iniciado");
-                    continue;
-                }
-                server.Stop();
-                Console.WriteLine("Servidor detenido.");
-            }
-            else if (command.StartsWith("login "))
-            {
-                string userNameToFind = command.Substring(5);
+                string userNameToFind = command.Substring(6);
                 Client foundClient = null!;
                 foreach (Client client in clients)
                 {
@@ -157,10 +98,9 @@ class Program
                 string userNameToFind;
                 string subjectToFind;
 
-                if (parts.Length == 4)
+                if (parts.Length == 3)
                 {
-                    userNameToFind = parts[2];
-                    subjectToFind = parts[3];
+                    subjectToFind = parts[2];
                 }
                 else
                 {
@@ -184,6 +124,7 @@ class Program
                     continue;
                 }
 
+                userNameToFind = foundEmail.To;
                 Client foundClient = null!;
                 foreach (Client client in clients)
                 {
@@ -200,17 +141,93 @@ class Program
                     continue;
                 }
 
+                server.emails.Add(foundEmail);
                 foundClient.SendEmail(foundEmail);
                 mainClient.mailbox.SendEmails.Add(foundEmail);
                 mainClient.mailbox.DraftEmails.Remove(foundEmail);
                 Console.WriteLine("Correo enviado satisfactoriamente.");
             }
-            else if (command.StartsWith("receive email "))
+            else if (command.StartsWith("view folder "))
+            {
+                if(mainClient == null)
+                {
+                    Console.WriteLine("Necesitas logearte primero");
+                    continue;
+                }
+                string listView;
+
+                string[] parts = command.Split(' ');
+                if (parts.Length == 3)
+                {
+                    listView = parts[2];
+                }
+                else
+                {
+                    Console.WriteLine("El comando no tiene el formato correcto.");
+                    continue;
+                }
+
+                List<Email> list = mainClient.mailbox.DraftEmails;
+                if (listView == "send") list = mainClient.mailbox.SendEmails;
+                else if (listView == "receive") list = mainClient.mailbox.ReceivedEmails;
+                else if(listView == "draft") list = mainClient.mailbox.DraftEmails;
+                else
+                {
+                    Console.WriteLine("La lista seleccionada no existe");
+                    continue;
+                }
+
+                lastView = listView;
+                Auxiliar.PrintEmails(list);
+            }
+            else if (command.StartsWith("view email ")) 
+            {
+                if(mainClient == null)
+                {
+                    Console.WriteLine("Necesitas logearte primero");
+                    continue;
+                }
+
+                string[] parts = command.Split(' ');
+                string subjectToFind;
+
+                if (parts.Length == 3)
+                {
+                    subjectToFind = parts[2];
+                }
+                else
+                {
+                    Console.WriteLine("El comando no tiene el formato correcto.");
+                    continue;
+                }
+
+                Email foundEmail = null!;
+                List<Email> list = mainClient.mailbox.DraftEmails;
+                if (lastView == "send") list = mainClient.mailbox.SendEmails;
+                else if (lastView == "receive") list = mainClient.mailbox.ReceivedEmails;
+
+                foreach (Email email in list)
+                {
+                    if (email.Subject == subjectToFind)
+                    {
+                        foundEmail = email;
+                        break;
+                    }
+                }
+
+                if (foundEmail == null)
+                {
+                    Console.WriteLine($"No se encontró ningún correo electrónico con el asunto '{subjectToFind}' en la última carpeta abierta");
+                    continue;
+                }
+
+                foundEmail.Open();
+            }
+            else if (command == "receive email")
             {
                 // Similarmente, aquí necesitarías buscar al cliente que está recibiendo el correo electrónico
                 // y luego parsear el número de correo electrónico del comando
-                string[] parts = command.Split(' ');
-                string userNameToFind = parts[2];
+                string userNameToFind = mainClient!.username;
                 
                 int i = 0;
                 foreach (Email email in server.emails)
@@ -245,23 +262,26 @@ class Program
                     continue;
                 }
 
-                ;
+                
                 foundClient.mailbox.ReceivedEmails.Add(foundClient.ReceiveEmail(i));
                 Console.WriteLine("Correo recibido satisfactoriamente.");
             }
             else if (command == "help")
             {
                 Console.WriteLine("Comandos disponibles:");
-                Console.WriteLine("  start server: Inicia el servidor SMTP");
-                Console.WriteLine("  stop server: Detiene el servidor SMTP");
+                Console.WriteLine("  login <nombre del cliente>: Permite acceder a codigos de cliente");
                 Console.WriteLine("  create client <nombre>: Crea un nuevo cliente con el nombre especificado");
-                Console.WriteLine("  create email: Crea un nuevo correo electrónico");
-                Console.WriteLine("  send email <nombre del cliente> <correo electrónico>: Envía un correo electrónico desde el cliente especificado");
-                Console.WriteLine("  receive email <nombre del cliente>: Recibe un correo electrónico en el cliente especificado");
+                Console.WriteLine("  create email *necesita login*: Crea un nuevo correo electrónico");
+                Console.WriteLine("  send email <correo electrónico> *necesita login*: Envía un correo electrónico desde el cliente especificado");
+                Console.WriteLine("  receive email *necesita login*: Recibe un correo electrónico en el cliente logueado");
+                Console.WriteLine("  view folder <folder> *necesita login*: Imprime la carpeta de correos seleccionada");
+                Console.WriteLine("  view email <correo electrónico> *necesita login*: Imprime el correo descrito");
                 Console.WriteLine("  exit: Sale del programa");
             }
             else if (command == "exit")
             {
+                server.Stop();
+                Console.WriteLine("Servidor detenido.");
                 break;
             }
             else

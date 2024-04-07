@@ -102,8 +102,21 @@ namespace program
             writer.Flush();
 
             // Lee la respuesta del servidor
-            string response = "";
-            response += reader.ReadLine();
+            string[] response = new string[8];
+            reader.ReadLine();
+            response[0] = reader.ReadLine()!;
+            response[1] = reader.ReadLine()!;
+            response[2] = reader.ReadLine()!;
+            response[3] = reader.ReadLine()!;
+            response[4] = reader.ReadLine()!;
+            response[5] = reader.ReadLine()!;
+            response[6] = reader.ReadLine()!;
+            response[7] = reader.ReadToEnd();
+
+            for (int i = 0; i < response.Length; i++)
+            {
+                Console.WriteLine(response[i]);
+            }
 
             // Parsea la respuesta y crea un objeto Email
             Email email = Auxiliar.ParseEmail(response);
@@ -214,14 +227,6 @@ namespace program
         }
 
         //Imprimir el Mailbox completo
-        public void PrintEmails(List<Email> emails)
-        {
-            Console.WriteLine("{0,-30} {1,-30} {2,-30}", "De", "Asunto", "Recibido");
-            foreach (var email in emails)
-            {
-                Console.WriteLine("{0,-30} {1,-30} {2,-30}", email.From, email.Subject, email.Received);
-            }
-        }
 
         //Formatear las fechas de un string a un tipo DateTime
         private DateTime dateFormats(string Date)
@@ -251,12 +256,12 @@ namespace program
 
     public static class Auxiliar
     {
-        public static Email ParseEmail(string rawEmail)
+        public static Email ParseEmail(string[] rawEmail)
         {
             Email email = new Email();
-            string[] lines = rawEmail.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-
-            foreach (string line in lines)
+            email.Content = "";
+            
+            foreach (string line in rawEmail)
             {
                 if (line.StartsWith("From: "))
                 {
@@ -288,7 +293,7 @@ namespace program
                 }
                 else
                 {
-                    email.Content += line + "\n";
+                    email.Content = rawEmail[7];
                 }
             }
 
@@ -305,6 +310,15 @@ namespace program
             if (boolean == "true") return true;
             else if (boolean == "false") return false;
             else return false;
+        }
+    
+        public static void PrintEmails(List<Email> emails)
+        {
+            Console.WriteLine("{0,-30} {1,-30} {2,-30}", "De", "Asunto", "");
+            foreach (var email in emails)
+            {
+                Console.WriteLine("{0,-30} {1,-30} {2,-30}", email.To, email.Subject, email.Received);
+            }
         }
     }
 }
