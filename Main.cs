@@ -1,274 +1,614 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using NStack;
+using program;
 
-namespace SMTPClient
+using System;
+using System.ComponentModel.DataAnnotations;
+using Terminal.Gui;
+
+class Program
 {
-    //Crear un email
-    public class Email
+    static void Main(string[] args)
     {
-        public string server = "localhost";
-        public int port = 25; // Puerto SMTP por defecto
-        public string From { get; set; } = "";
-        public string To { get; set; } = "";
-        public string Subject { get; set; } = "";
-        public string Content { get; set; } = "";
-        public DateTime Received { get; set; }
-        public bool Unread { get; set; }
-        public bool HasAttachment { get; set; }
-        public bool IsImportant { get; set; }
+        Application.Init();
+        var top = Application.Top;
 
-        //Ver el Content del email
-        public void Open()
+        // Configurar el esquema de colores para el texto azul
+        Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightMagenta, Color.Black);
+        Colors.Base.Focus = Application.Driver.MakeAttribute(Color.White, Color.DarkGray);
+        Colors.Base.HotNormal = Application.Driver.MakeAttribute(Color.White, Color.BrightMagenta);
+        Colors.Base.HotFocus = Application.Driver.MakeAttribute(Color.BrightMagenta, Color.Black);
+        Colors.Base.Disabled = Application.Driver.MakeAttribute(Color.DarkGray, Color.Black);
+        var win = new Window("Cliente SMTP en Terminal")
         {
-            Unread = false;
-            Console.WriteLine("Contenido del correo: " + Content);
-        }
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill(),
+            Height = Dim.Fill()
+        };
+        top.Add(win);
 
-        //Cambiar la prioridad de un email
-        public void ChangePriority()
+        // Configurar los campos de texto con bordes ovalados (solución alternativa)
+        // Nota: Terminal.Gui no soporta directamente bordes ovalados, por lo que esta parte es conceptual.
+
+        var scrollView = new ScrollView
         {
-            IsImportant = !IsImportant;
-        }
+            X = 0,
+            Y = 0,
+            Width = Dim.Percent(100),
+            Height = Dim.Percent(100)
+        };
+        win.Add(scrollView);
+        SmtpServer server = new SmtpServer();
+        List<Client> clients = new List<Client>();
+        Client mainClient = null!;
+        string lastView = "";
 
-        //Imprimir todos los detalles del email. Quizas lo quito, no me queda clara la utilidad
-        public override string ToString()
+        Thread serverThread = new Thread(new ThreadStart(server.Start));
+        serverThread.Start();
+
+        // Ejemplo de un campo de texto para el inicio de sesión
+
+        var loginButton = new Button("Login") { X = 60, Y = 2 };
+        loginButton.Clicked += () =>
         {
-            return $"De: {From}\nAsunto: {Subject}\nRecibido: {Received}\nNo leído: {Unread}\nTiene adjunto: {HasAttachment}\nEs importante: {IsImportant}";
-        }
+            Application.Top.Clear();
+            var newWindow = new Window("Login")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
 
-        public void SendEmail()
+            // Agregar contenido a la nueva ventana
+            var label = new Label("Ingrese su nombre")
+            {
+                X = 1,
+                Y = 1
+            };
+            newWindow.Add(label);
+
+            // Agregar la nueva ventana al Application.Top
+            var loginLabel = new Label("Login:") { X = 3, Y = 2 };
+            var loginText = new TextField("") { X = 10, Y = 2, Width = 40 };
+            var loginButton = new Button("Login") { X = 55, Y = 2 };
+            var backButton = new Button("Back") { X = 20, Y = 5 };
+            newWindow.Add(loginLabel, loginText, loginButton, backButton);
+            loginButton.Clicked += () =>
+            {
+                try
+                {
+
+                    string userNameToFind = loginText.Text.ToString()!;
+                    Client foundClient = null!;
+                    foreach (Client client in clients)
+                    {
+                        if (client.username == userNameToFind)
+                        {
+                            foundClient = client;
+                            break;
+                        }
+                    }
+
+                    if (foundClient == null)
+                    {
+                        throw new Exception($"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'");
+
+
+                    }
+                    else
+                    {
+                        mainClient = foundClient;
+
+                        MessageBox.Query(20, 7, "Login", "Login exitoso", "Ok");
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    MessageBox.Query(20, 7, "Error", e.Message, "Ok");
+                }
+
+
+            };
+            backButton.Clicked += () =>
+            {
+                Application.RequestStop();
+            };
+            // Hacer visible la nueva ventana
+            Application.Run(newWindow);
+        };
+        win.Add(loginButton);
+
+
+
+        // Por ejemplo, un botón para crear un nuevo cliente
+        var createClientButton = new Button("Create Client") { X = 60, Y = 4 };
+        createClientButton.Clicked += () =>
         {
-            // Establece los parámetros del correo electrónico: Define el servidor SMTP (localhost), el puerto SMTP (25), el correo electrónico del remitente (this.From), 
-            // el correo electrónico del destinatario ("destinatario@example.com"), el asunto del correo electrónico (this.Subject) y el cuerpo del correo electrónico (this.Content).
-            
-            string fromEmail = From;
-            string toEmail = To; // Deberías agregar un campo 'To' en tu clase 'Email'
-            string subject = Subject;
-            string body = Content;
+            Application.Top.Clear();
+            var newWindow = new Window("Create Client")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
+            var label = new Label("Ingrese su nombre")
+            {
+                X = 1,
+                Y = 1
+            };
+            newWindow.Add(label);
+
+            // Agregar la nueva ventana al Application.Top
+            var createLabel = new Label("UserName:") { X = 3, Y = 2 };
+            var createText = new TextField("") { X = 10, Y = 2, Width = 40 };
+            var createButton = new Button("Create") { X = 55, Y = 2 };
+            var backButton = new Button("Back") { X = 20, Y = 5 };
+            newWindow.Add(createButton, createText, createButton, backButton);
+            createButton.Clicked += () =>
+            {
+                try
+                {
+                    string userName = createText.Text.ToString()!;
+                    Client client = new Client(userName);
+                    clients.Add(client);
+                    MessageBox.Query(20, 7, "Create Client", $"Cliente {userName} creado.", "Ok");
+
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
+            };
+            backButton.Clicked += () =>
+           {
+               Application.RequestStop();
+           };
+            // Hacer visible la nueva ventana
+            Application.Run(newWindow);
+        };
+        win.Add(createClientButton);
+
+        // Ejemplo de un botón para enviar un correo electrónico
+        var sendEmailButton = new Button("Send Email") { X = 60, Y = 6 };
+        sendEmailButton.Clicked += () =>
+        {
+            Application.Top.Clear();
+            var newWindow = new Window("Send email")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
 
 
-            
+            var smtpServerLabel = new Label("Servidor SMTP:") { X = 3, Y = 1 };
+            var smtpServer = new TextField("") { X = 3, Y = 2, Width = 40 };
+            newWindow.Add(smtpServerLabel, smtpServer);
 
-            // Crea una nueva conexión TCP al servidor SMTP: Utiliza la clase TcpClient para establecer una nueva conexión al servidor SMTP en el puerto especificado.
-            TcpClient client = new TcpClient(server, port); 
-            // Obtiene el flujo de red: Utiliza el método GetStream para obtener el NetworkStream asociado a la conexión TCP. Este flujo se utiliza para enviar y recibir datos.
-            NetworkStream ns = client.GetStream();
-            byte[] dataBuffer;
-            string responseString;
+            var portLabel = new Label("Puerto:") { X = 50, Y = 1 };
+            var port = new TextField("25") { X = 50, Y = 2, Width = 40 };
+            newWindow.Add(portLabel, port);
 
-            // Envía el comando HELO al servidor SMTP: Este es el primer comando que se envía a un servidor SMTP para iniciar la conversación. El servidor debe responder con un 
-            // código de estado 250 para indicar que está listo para aceptar comandos.
-            dataBuffer = Encoding.ASCII.GetBytes($"HELO {server}\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            var usernameLabel = new Label("Nombre de usuario:") { X = 3, Y = 4 };
+            var username = new TextField(mainClient.username) { X = 3, Y = 5, Width = 40 };
+            newWindow.Add(usernameLabel, username);
 
-            // Envía el comando MAIL FROM al servidor SMTP: Este comando indica el remitente del correo electrónico. El servidor debe responder con un código de estado 250 para indicar 
-            // que el remitente es aceptable.
-            dataBuffer = Encoding.ASCII.GetBytes($"MAIL FROM:<{fromEmail}>\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            // Envía el comando RCPT TO al servidor SMTP: Este comando indica el destinatario del correo electrónico. El servidor debe responder con un código de estado 250 para indicar 
-            // que el destinatario es aceptable.
-            dataBuffer = Encoding.ASCII.GetBytes($"RCPT TO:<{toEmail}>\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            var recipientLabel = new Label("Destinatario:") { X = 3, Y = 7 };
+            var recipient = new TextField("") { X = 3, Y = 8, Width = 40 };
+            newWindow.Add(recipientLabel, recipient);
 
-            // Envía el comando DATA al servidor SMTP: Este comando indica al servidor que el cliente está listo para enviar el cuerpo del correo electrónico. El servidor debe responder 
-            // con un código de estado 354 para indicar que está listo para recibir los datos.
-            dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            var subjectLabel = new Label("Asunto:") { X = 3, Y = 9 };
+            var subject = new TextField("") { X = 3, Y = 10, Width = 40 };
+            newWindow.Add(subjectLabel, subject);
 
-            // Envía el cuerpo del correo electrónico al servidor SMTP: En este punto, se envía el asunto y el cuerpo del correo electrónico. El cuerpo del correo electrónico se termina 
-            // con una línea que contiene solo un punto (.\r\n). El servidor debe responder con un código de estado 250 para indicar que el correo electrónico ha sido aceptado para su entrega.
-            dataBuffer = Encoding.ASCII.GetBytes($"Subject: {subject}\r\n\r\n{body}\r\n.\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            var bodyLabel = new Label("Cuerpo del mensaje:") { X = 3, Y = 11 };
+            var body = new TextField("") { X = 3, Y = 12, Width = 50, Height = 50 }; // Aumentar la altura
+            newWindow.Add(bodyLabel, body);
 
-            // Envía el comando QUIT al servidor SMTP: Este comando indica al servidor que el cliente ha terminado de enviar comandos. El servidor debe responder con 
-            // un código de estado 221 para indicar que está cerrando la conexión.
-            dataBuffer = Encoding.ASCII.GetBytes("QUIT\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            var attachmentLabel = new Label("Archivo Adjunto:") { X = 3, Y = 14 };
+            var attachment = new TextField("") { X = 3, Y = 15, Width = 30, Height = 1 }; // Aumentar la altura
+            newWindow.Add(attachmentLabel, attachment);
+            var backButton = new Button("Back") { X = 20, Y = 17 };
+            newWindow.Add(backButton);
 
-            // Cierra el flujo de red y la conexión TCP: Finalmente, se cierra el NetworkStream y la conexión TCP con el servidor SMTP.
-            ns.Close();
-            client.Close();
-        }
+            // var createButton = new Button("Create Message ✉️") { X = 6, Y = 17 };
+            // createButton.Clicked += () =>
+            // {
+            //     Email email = new Email()
+            //     {
+            //         From = username.Text.ToString()!,
+            //         To = recipient.Text.ToString()!,
+            //         Subject = subject.Text.ToString()!,
+            //         Content = body.Text.ToString()!,
+            //         Received = DateTime.Now,
+            //         Unread = true,
+            //         HasAttachment = false,
+            //         IsImportant = false
+            //     };
+            //     //email.AttachmentPath = attachment.Text.ToString()!;
+            //     mainClient.mailbox.DraftEmails.Add(email);
+            //     MessageBox.Query(20, 7, "Éxito", "Correo creado exitosamente.", "Ok");
+            // };
+            var sendButton = new Button("Send ✉️") { X = 6, Y = 17 };
+            sendButton.Clicked += () =>
+            {
+                try
+                {
+
+                    {
+                        // client.Credentials = new System.Net.NetworkCredential(username.Text.ToString(), password.Text.ToString());
+                        // client.EnableSsl = true;
+
+                        Email email = new Email()
+                        {
+                            From = username.Text.ToString()!,
+                            To = recipient.Text.ToString()!,
+                            Subject = subject.Text.ToString()!,
+                            Content = body.Text.ToString()!,
+                            Received = DateTime.Now,
+                            Unread = true,
+                            HasAttachment = false,
+                            IsImportant = false
+                        };
+                        //email.AttachmentPath = attachment.Text.ToString()!;
+                        //comprobar que este logueado
+                        //mainClient.mailbox.DraftEmails.Add(email);
+
+
+
+                        string userNameToFind = email.To;
+                        Client foundClient = null!;
+                        foreach (Client client in clients)
+                        {
+                            if (client.username == userNameToFind)
+                            {
+                                foundClient = client;
+                                break;
+                            }
+                        }
+
+                        if (foundClient == null)
+                        {
+                            MessageBox.Query(20, 7, "Error", $"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'", "Ok");
+
+
+                        }
+
+                        server.emails.Add(email);
+                        foundClient.SendEmail(email);
+                        mainClient.mailbox.SendEmails.Add(email);
+                        //mainClient.mailbox.DraftEmails.Remove(email);
+
+                        MessageBox.Query(20, 7, "Éxito", "Correo enviado exitosamente.", "Ok");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Query(20, 7, "Error", "Error al enviar el correo: " + ex.Message, "Ok");
+                }
+            };
+            newWindow.Add(sendButton);
+            backButton.Clicked += () =>
+           {
+               Application.RequestStop();
+           };
+            // Hacer visible la nueva ventana
+            Application.Run(newWindow);
+        };
+        win.Add(sendEmailButton);
+
+        // Ejemplo de un botón para recibir un correo electrónico
+        var receiveEmailButton = new Button("Receive Email") { X = 60, Y = 8 };
+        receiveEmailButton.Clicked += () =>
+        {
+            Application.Top.Clear();
+            var newWindow = new Window("Receive email")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
+
+            var backButton = new Button("Back") { X = 20, Y = 8 };
+            newWindow.Add(backButton);
+            var receiveEmailButton = new Button("Receive Email") { X = 3, Y = 8 };
+            newWindow.Add(receiveEmailButton);
+            receiveEmailButton.Clicked += () =>
+            {
+                List<int> list = new List<int>();
+                string userNameToFind = mainClient!.username;
+
+                int i = 0;
+                foreach (Email email in server.emails)
+                {
+                    if (email.To == userNameToFind)
+                    {
+                        list.Add(i);
+                    }
+                    i++;
+                }
+
+                if (list.Count() != 0)
+                {
+                    Client foundClient = null!;
+                    foreach (Client client in clients)
+                    {
+                        if (client.username == userNameToFind)
+                        {
+                            foundClient = client;
+                            break;
+                        }
+                    }
+                    if (foundClient == null)
+                    {
+                        MessageBox.Query(20, 7, "Error", $"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'", "Ok");
+                    }
+
+                    for (int j = 0; j < list.Count(); j++)
+                    {
+                        foundClient.mailbox.ReceivedEmails.Add(foundClient.ReceiveEmail(j));
+                    }
+                    MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
+                }
+                else
+                {
+                    MessageBox.Query(20, 7, "Error", "No se encontró ningún email para recibir", "Ok");
+                }
+            };
+            backButton.Clicked += () =>
+           {
+               Application.RequestStop();
+           };
+            Application.Run(newWindow);
+
+        };
+        win.Add(receiveEmailButton);
+
+
+        // Ejemplo de un botón para visualizar carpetas de correo
+        var viewFolderButton = new Button("View Folder") { X = 60, Y = 10 };
+        viewFolderButton.Clicked += () =>
+        {
+            Application.Top.Clear();
+            var newWindow = new Window("View Folder")
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
+
+            var backButton = new Button("Back") { X = 20, Y = 10 };
+            newWindow.Add(backButton);
+            var viewFolderButton = new Button("View Folder") { X = 3, Y = 10 };
+            newWindow.Add(viewFolderButton);
+            var rect = new Rect(1, 1, 20, 3);
+
+            // Definir las etiquetas de los botones de radio
+            var radioLabels = new ustring[] { "send", "receive", "draft" };
+            var radioGroup = new RadioGroup(rect, radioLabels, 0);
+            newWindow.Add(radioGroup);
+
+
+            viewFolderButton.Clicked += () =>
+            {
+                if (mainClient != null)
+                {
+                    string listView;
+                    var selectedIndex = radioGroup.SelectedItem;
+                    var selectedLabel = radioLabels[selectedIndex];
+                    listView = selectedLabel.ToString()!;
+                    List<Email> list = mainClient.mailbox.DraftEmails;
+                    if (listView == "send") list = mainClient.mailbox.SendEmails;
+                    else if (listView == "receive") list = mainClient.mailbox.ReceivedEmails;
+                    else if (listView == "draft") list = mainClient.mailbox.DraftEmails;
+
+                    lastView = listView;
+
+                    // Suponiendo que 'emails' es una lista de objetos email válida
+                    var head = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "De", "Asunto", ""))
+                    {
+                        X = 3,
+                        Y = 12,
+                        Width = Dim.Fill(),
+                        Height = 1
+                    };
+                    var head1 = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "Para", "Asunto", ""))
+                    {
+                        X = 3,
+                        Y = 12,
+                        Width = Dim.Fill(),
+                        Height = 1
+                    };
+                    if (listView == "send") newWindow.Add(head);
+                    else if (listView == "receive") newWindow.Add(head1);
+
+                    int yPos = 14;
+                    var rect1 = new Rect(3, 14, 20, 3);
+                    var radioLabels1 = new List<ustring>();
+                    foreach (var email in list)
+                    {
+                        radioLabels1.Add(string.Format("{0,-30} {1,-30} {2,-30}", email.To, email.Subject, email.Received));
+                    }
+                    var radioGroup1 = new RadioGroup(rect1, radioLabels1.ToArray(), 0);
+                    newWindow.Add(radioGroup1);
+                    var viewButton = new Button("View Email") { X = 100, Y = 16 };
+                    newWindow.Add(viewButton);
+                    viewButton.Clicked += () =>
+                    {
+                        var selectedIndex = radioGroup1.SelectedItem;
+                        var selectedLabel = radioLabels1[selectedIndex].ToString();
+                        string[] partes = selectedLabel!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        string subjectToFind = "";
+                        for (int i = 1; i < partes.Length -3; i++)
+                        {
+                            subjectToFind += partes[i] + " ";
+
+                        }
+                        string sinUltimoCaracter = subjectToFind.Substring(0, subjectToFind.Length - 1);
+                        System.Console.WriteLine(sinUltimoCaracter);
+                        System.Console.WriteLine(sinUltimoCaracter[sinUltimoCaracter.Length -1]);
+                        Email foundEmail = null!;
+                        foreach (Email email in list)
+                        {
+                            if (email.Subject == sinUltimoCaracter)
+                            {
+                                foundEmail = email;
+                                break;
+                            }
+                        }
+                        var emailprinter = new Label("Contenido del correo\n" + foundEmail.Content)
+                        {
+                            X = 3,
+                            Y = radioGroup1.Y + 6,
+                            Width = Dim.Fill(),
+                            Height = 25
+                        };
+                        newWindow.Add(emailprinter);
+
+
+                    };
+
+                };
+
+            };
+
+            backButton.Clicked += () =>
+          {
+              Application.RequestStop();
+          };
+            Application.Run(newWindow);
+        };
+        win.Add(viewFolderButton);
+
+        var exitButton = new Button("Exit") { X = 60, Y = 12 };
+        exitButton.Clicked += () =>
+        {
+            server.Stop();
+            Application.RequestStop();
+
+        };
+        win.Add(exitButton);
+        // var viewdFolderButton = new Button("View Folder") { X = 3, Y = 10 };
+        // viewFolderButton.Clicked += () =>
+        // {
+        //     // Lógica para visualizar carpetas de correo
+        //     MessageBox.Query(20, 7, "View Folder", "Carpeta visualizada", "Ok");
+        // };
+        // win.Add(viewFolderButton);
+
+
+        Application.Run();
     }
-
-    //Crear un Mailbox (Buzon de correo)
-    public class Mailbox
-    {
-        public List<Email> Emails { get; set; } = new List<Email>();
-
-        //Ordenar por orden alfabetico segun el From de los correos
-        public void SortByFrom()
-        {
-            Emails = Emails.OrderBy(email => email.From).ToList();
-        }
-
-        //Ordenar por orden alfabetico segun el Subject de los correos
-        public void SortBySubject()
-        {
-            Emails = Emails.OrderBy(email => email.Subject).ToList();
-        }
-
-        //Ordenar por orden de llegada segun el Received de los correos
-        public void SortByReceived()
-        {
-            Emails = Emails.OrderBy(email => email.Received).ToList();
-        }
-
-        //Buscar un correo por una aparicion de subject (lo que se busca) en algun Subject
-        //Se imprimen todos los correos que matcheen
-        public List<Email> SearchBySubject(string subject)
-        {
-            return Emails.Where(email => email.Subject.Contains(subject)).ToList();
-        }
-
-        //Buscar un correo por una aparicion de from (lo que se busca) en algun From
-        //Se imprimen todos los correos que matcheen
-        public List<Email> SearchByFrom(string from)
-        {
-            return Emails.Where(email => email.From.Contains(from)).ToList();
-        }
-
-        //Buscar un correo por una aparicion de received (lo que se busca) en algun Received
-        //Se imprimen todos los correos que matcheen
-        public List<Email> SearchByReceived(string received)
-        {
-            DateTime date = dateFormats(received);
-            return Emails.Where(email => email.Received.Date == date.Date).ToList();
-        }
-
-        //Buscar un correo por una aparicion de content (lo que se busca) en algun Content
-        //Se imprimen todos los correos que matcheen
-        public List<Email> SearchByContent(string content)
-        {
-            return Emails.Where(email => email.Content.Contains(content)).ToList();
-        }
-
-        public List<Email> SearchEverything(string search)
-        {
-            var emailsBySubject = SearchBySubject(search);
-            var emailsByFrom = SearchByFrom(search);
-            var emailsByReceived = SearchByReceived(search);
-            var emailsByContent = SearchByContent(search);
-
-            var allEmails = emailsBySubject.Concat(emailsByFrom)
-                                            .Concat(emailsByReceived)
-                                            .Concat(emailsByContent)
-                                            .Distinct() //Para eliminar duplicados
-                                            .ToList();
-
-            return allEmails;
-        }
-
-        //Imprimir el Mailbox completo
-        public void PrintEmails(List<Email> emails)
-        {
-            Console.WriteLine("{0,-30} {1,-30} {2,-30}", "De", "Asunto", "Recibido");
-            foreach (var email in emails)
-            {
-                Console.WriteLine("{0,-30} {1,-30} {2,-30}", email.From, email.Subject, email.Received);
-            }
-        }
-
-        //Formatear las fechas de un string a un tipo DateTime
-        private DateTime dateFormats(string Date)
-        {
-            string[] dateFormats = { "dd MMMM yyyy", "dd 'de' MMMM 'del' yyyy", "dd/MM/yyyy", "MM-dd-yyyy", "yyyy/MM/dd", "M/d/yyyy", "M/d/yy" };
-
-            return DateTime.Now;
-        }
-
-        public void DeleteEmail(int index)
-        {
-            if (index >= 0 && index < Emails.Count)
-            {
-                Emails.RemoveAt(index);
-                Console.WriteLine("Correo eliminado.");
-            }
-            else
-            {
-                Console.WriteLine("Índice de correo no válido.");
-            }
-        }
-    //! Implementar el sistema de carpetas para los correos
-    //? Mejorar el sistema de busqueda de correos (mas rapido y que no distinga entre mayusculas y minusculas y palabras con y sin tilde, etc)
-
-        
-
-    }
-
-
-    //public class Program
-    //{
-    //     public static void Main()
-    //     {
-    //         Mailbox mailbox = new Mailbox
-    //         {
-    //             Emails = new List<Email>
-    //             {
-    //                 new Email
-    //                 {
-    //                     From = "juan@example.com",
-    //                     Subject = "Hola",
-    //                     Content = "lorem ipsum",
-    //                     Received = DateTime.Now,
-    //                     Unread = true,
-    //                     HasAttachment = false,
-    //                     IsImportant = false
-    //                 },
-    //                 new Email
-    //                 {
-    //                     From = "dani@example.com",
-    //                     Subject = "Trabajo urgente",
-    //                     Content = "lorem ipsum",
-    //                     Received = DateTime.Now,
-    //                     Unread = true,
-    //                     HasAttachment = false,
-    //                     IsImportant = false
-    //                 },
-    //                 new Email
-    //                 {
-    //                     From = "nanda@example.com",
-    //                     Subject = "Salida proxima",
-    //                     Content = "lorem ipsum",
-    //                     Received = DateTime.MinValue,
-    //                     Unread = true,
-    //                     HasAttachment = false,
-    //                     IsImportant = false
-    //                 },
-    //                 new Email
-    //                 {
-    //                     From = "adrian@example.com",
-    //                     Subject = "Prueba urgente",
-    //                     Content = "lorem ipsum",
-    //                     Received = DateTime.Today,
-    //                     Unread = true,
-    //                     HasAttachment = false,
-    //                     IsImportant = false
-    //                 },
-    //             }
-    //         };
-
-            
-    //         mailbox.Emails[0].SendEmail();
-    //     }
-    // }
 }
+
+
+// class Program
+// {
+//     static void Main(string[] args)
+//     {
+//         // Crear una instancia del servidor SMTP
+//         SmtpServer server = new SmtpServer();
+//         List<Client> clients = new List<Client>();
+//         Client mainClient = null!;
+//         string lastView = "";
+
+//         Thread serverThread = new Thread(new ThreadStart(server.Start));
+//         serverThread.Start();
+//         Console.WriteLine("Servidor iniciado.");
+
+//         while (true)
+//         {
+//             
+//                 
+//             
+//             
+//             else if (command.StartsWith("send email "))
+//             {
+//                 // Aquí necesitarías alguna forma de buscar al cliente que está enviando el correo electrónico
+//                 // y luego parsear el resto del comando para crear el correo electrónico
+//                 if(mainClient == null)
+//                 {
+//                     Console.WriteLine("Necesitas logearte primero");
+//                     continue;
+//                 }
+
+//                 string[] parts = command.Split(' ');
+//                 string userNameToFind;
+//                 string subjectToFind;
+
+//                 if (parts.Length == 3)
+//                 {
+//                     subjectToFind = parts[2];
+//                 }
+//                 else
+//                 {
+//                     Console.WriteLine("El comando no tiene el formato correcto.");
+//                     continue;
+//                 }
+
+//                 Email foundEmail = null!;
+//                 foreach (Email email in mainClient.mailbox.DraftEmails)
+//                 {
+//                     if (email.Subject == subjectToFind)
+//                     {
+//                         foundEmail = email;
+//                         break;
+//                     }
+//                 }
+
+//                 if (foundEmail == null)
+//                 {
+//                     Console.WriteLine($"No se encontró ningún correo electrónico con el asunto '{subjectToFind}'");
+//                     continue;
+//                 }
+
+//                 userNameToFind = foundEmail.To;
+//                 Client foundClient = null!;
+//                 foreach (Client client in clients)
+//                 {
+//                     if (client.username == userNameToFind)
+//                     {
+//                         foundClient = client;
+//                         break;
+//                     }
+//                 }
+
+//                 if (foundClient == null)
+//                 {
+//                     Console.WriteLine($"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'");
+//                     continue;
+//                 }
+
+//                 server.emails.Add(foundEmail);
+//                 foundClient.SendEmail(foundEmail);
+//                 mainClient.mailbox.SendEmails.Add(foundEmail);
+//                 mainClient.mailbox.DraftEmails.Remove(foundEmail);
+//                 Console.WriteLine("Correo enviado satisfactoriamente.");
+//             }
+//          
+//               
+//            
+
+//            
+//             
+//             else if (command == "exit")
+//             {
+//                 server.Stop();
+//                 Console.WriteLine("Servidor detenido.");
+//                 break;
+//             }
+//             else
+//             {
+//                 Console.WriteLine("Comando no reconocido. Escribe 'help' para ver la lista de comandos disponibles.");
+//             }
+//         }
+//     }
+// }

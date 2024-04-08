@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5ny7bUN4HR4Rscvln0pR9vgehGRnc7ZcH37Z31Ej2Om3JgkgApFNNSaspBIt/q6rXgmsiOnyjdIaPQH8SyayrQ==",
+  "dgSpecHash": "enWglxJN72G1C7SkK/glcgqMt2sVhoBMloPPiS1R4p2BrmEggkCHnLe7b4wJRTwQUd22jIlVtl57TsIn59Lf8Q==",
   "success": true,
-  "projectFilePath": "D:\\SMTP\\SMTP.csproj",
+  "projectFilePath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\maria\\.nuget\\packages\\nstack.core\\1.1.1\\nstack.core.1.1.1.nupkg.sha512",
     "C:\\Users\\maria\\.nuget\\packages\\system.codedom\\8.0.0\\system.codedom.8.0.0.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SMTP\\SMTP.csproj": {}
+    "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj": {}
   },
   "projects": {
-    "D:\\SMTP\\SMTP.csproj": {
+    "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SMTP\\SMTP.csproj",
+        "projectUniqueName": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj",
         "projectName": "SMTP",
-        "projectPath": "D:\\SMTP\\SMTP.csproj",
+        "projectPath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj",
         "packagesPath": "C:\\Users\\maria\\.nuget\\packages\\",
-        "outputPath": "D:\\SMTP\\obj\\",
+        "outputPath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\maria\\AppData\\Roaming\\NuGet\\NuGet.Config",
