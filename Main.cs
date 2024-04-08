@@ -1,4 +1,4 @@
-﻿using NStack;
+using NStack;
 using program;
 
 using System;

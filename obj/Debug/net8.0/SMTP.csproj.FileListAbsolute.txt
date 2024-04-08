@@ -47,6 +47,7 @@ D:\UNI\3er año\1er Semestre\RC\Proyecto\SMTP\obj\Debug\net8.0\refint\SMTP.dll
 D:\UNI\3er año\1er Semestre\RC\Proyecto\SMTP\obj\Debug\net8.0\SMTP.pdb
 D:\UNI\3er año\1er Semestre\RC\Proyecto\SMTP\obj\Debug\net8.0\SMTP.genruntimeconfig.cache
 D:\UNI\3er año\1er Semestre\RC\Proyecto\SMTP\obj\Debug\net8.0\ref\SMTP.dll
+<<<<<<< HEAD
 C:\Users\maria\Downloads\SMTP-main\bin\Debug\net8.0\SMTP.exe
 C:\Users\maria\Downloads\SMTP-main\bin\Debug\net8.0\SMTP.deps.json
 C:\Users\maria\Downloads\SMTP-main\bin\Debug\net8.0\SMTP.runtimeconfig.json
@@ -71,3 +72,5 @@ C:\Users\maria\Downloads\SMTP-main\obj\Debug\net8.0\refint\SMTP.dll
 C:\Users\maria\Downloads\SMTP-main\obj\Debug\net8.0\SMTP.pdb
 C:\Users\maria\Downloads\SMTP-main\obj\Debug\net8.0\SMTP.genruntimeconfig.cache
 C:\Users\maria\Downloads\SMTP-main\obj\Debug\net8.0\ref\SMTP.dll
+=======
+>>>>>>> 12e0e6d20c55fd37d314c72584adf5e75e91c849

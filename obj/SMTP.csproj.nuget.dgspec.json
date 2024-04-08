@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj": {}
   },
   "projects": {
@@ -12,16 +13,27 @@
         "projectPath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj",
         "packagesPath": "C:\\Users\\maria\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\obj\\",
+=======
+    "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\SMTP.csproj": {}
+  },
+  "projects": {
+    "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\SMTP.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\SMTP.csproj",
+        "projectName": "SMTP",
+        "projectPath": "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\SMTP.csproj",
+        "packagesPath": "C:\\Users\\Dani\\.nuget\\packages\\",
+        "outputPath": "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\obj\\",
+>>>>>>> 12e0e6d20c55fd37d314c72584adf5e75e91c849
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\maria\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\Dani\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -66,7 +78,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

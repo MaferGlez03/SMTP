@@ -1,14 +1,20 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "enWglxJN72G1C7SkK/glcgqMt2sVhoBMloPPiS1R4p2BrmEggkCHnLe7b4wJRTwQUd22jIlVtl57TsIn59Lf8Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\maria\\OneDrive\\Desktop\\SMTP\\SMTP\\SMTP.csproj",
+=======
+  "dgSpecHash": "BP/QLKu4++S3o2csY+eu82/SS0GJKLjhol9j9V/HvHnNiByKWcONobTFrtnnS4nku1XmJ1i8DKn5eLO03dq9TA==",
+  "success": true,
+  "projectFilePath": "D:\\UNI\\3er año\\1er Semestre\\RC\\Proyecto\\SMTP\\SMTP.csproj",
+>>>>>>> 12e0e6d20c55fd37d314c72584adf5e75e91c849
   "expectedPackageFiles": [
-    "C:\\Users\\maria\\.nuget\\packages\\nstack.core\\1.1.1\\nstack.core.1.1.1.nupkg.sha512",
-    "C:\\Users\\maria\\.nuget\\packages\\system.codedom\\8.0.0\\system.codedom.8.0.0.nupkg.sha512",
-    "C:\\Users\\maria\\.nuget\\packages\\system.management\\8.0.0\\system.management.8.0.0.nupkg.sha512",
-    "C:\\Users\\maria\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
-    "C:\\Users\\maria\\.nuget\\packages\\terminal.gui\\1.15.1\\terminal.gui.1.15.1.nupkg.sha512"
+    "C:\\Users\\Dani\\.nuget\\packages\\nstack.core\\1.1.1\\nstack.core.1.1.1.nupkg.sha512",
+    "C:\\Users\\Dani\\.nuget\\packages\\system.codedom\\8.0.0\\system.codedom.8.0.0.nupkg.sha512",
+    "C:\\Users\\Dani\\.nuget\\packages\\system.management\\8.0.0\\system.management.8.0.0.nupkg.sha512",
+    "C:\\Users\\Dani\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512",
+    "C:\\Users\\Dani\\.nuget\\packages\\terminal.gui\\1.15.1\\terminal.gui.1.15.1.nupkg.sha512"
   ],
   "logs": []
 }
