@@ -39,6 +39,30 @@ namespace program
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
+            dataBuffer = Encoding.ASCII.GetBytes($"RSET\r\n");
+            ns.Write(dataBuffer, 0, dataBuffer.Length);
+            dataBuffer = new byte[1024];
+            ns.Read(dataBuffer, 0, dataBuffer.Length);
+            responseString = Encoding.ASCII.GetString(dataBuffer);
+
+            dataBuffer = Encoding.ASCII.GetBytes($"VRFY {fromEmail}\r\n");
+            ns.Write(dataBuffer, 0, dataBuffer.Length);
+            dataBuffer = new byte[1024];
+            ns.Read(dataBuffer, 0, dataBuffer.Length);
+            responseString = Encoding.ASCII.GetString(dataBuffer);
+
+            dataBuffer = Encoding.ASCII.GetBytes($"EXPN {toEmail}\r\n");
+            ns.Write(dataBuffer, 0, dataBuffer.Length);
+            dataBuffer = new byte[1024];
+            ns.Read(dataBuffer, 0, dataBuffer.Length);
+            responseString = Encoding.ASCII.GetString(dataBuffer);
+
+            dataBuffer = Encoding.ASCII.GetBytes($"NOOP\r\n");
+            ns.Write(dataBuffer, 0, dataBuffer.Length);
+            dataBuffer = new byte[1024];
+            ns.Read(dataBuffer, 0, dataBuffer.Length);
+            responseString = Encoding.ASCII.GetString(dataBuffer);
+
             // Envía el comando MAIL FROM al servidor SMTP: Este comando indica el remitente del correo electrónico. El servidor debe responder con un código de estado 250 para indicar 
             // que el remitente es aceptable.
             dataBuffer = Encoding.ASCII.GetBytes($"MAIL FROM:<{fromEmail}>\r\n");
@@ -260,7 +284,7 @@ namespace program
         {
             Email email = new Email();
             email.Content = "";
-            
+
             foreach (string line in rawEmail)
             {
                 if (line.StartsWith("From: "))
@@ -311,7 +335,7 @@ namespace program
             else if (boolean == "false") return false;
             else return false;
         }
-    
+
         public static void PrintEmails(List<Email> emails)
         {
             Console.WriteLine("{0,-30} {1,-30} {2,-30}", "De", "Asunto", "");

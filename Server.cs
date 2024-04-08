@@ -51,7 +51,7 @@ namespace program
                         int emailNumber = int.Parse(line.Substring(5));
                         if (emails.Count > 0)
                         {
-                            Email email = emails[emailNumber]; 
+                            Email email = emails[emailNumber];
 
                             writer.WriteLine(email.ToString());
                             writer.Flush();
@@ -71,6 +71,59 @@ namespace program
                     else if (line.StartsWith("RCPT TO:"))
                     {
                         to = line.Substring(8);
+                        writer.WriteLine("250 OK");
+                    }
+                    else if (line.StartsWith("RSET"))
+                    {
+                        // Restablece la transacción actual
+                        from = "";
+                        to = "";
+                        subject = "";
+                        writer.WriteLine("250 OK");
+                    }
+                    else if (line.StartsWith("VRFY"))
+                    {
+                        // Extrae la dirección de correo electrónico del comando
+                        string email = line.Substring(5);
+
+                        // Verifica si la dirección de correo electrónico existe
+                        // NOTA: Esta es solo una simulación. Deberías implementar tu propia lógica de verificación aquí.
+                        bool emailExists = VerifyEmail(email);
+
+                        // Responde al cliente
+                        if (emailExists)
+                        {
+                            writer.WriteLine("250 " + email);
+                        }
+                        else
+                        {
+                            writer.WriteLine("550 No such user");
+                        }
+                    }
+                    else if (line.StartsWith("EXPN"))
+                    {
+                        // Extrae el alias de correo del comando
+                        string alias = line.Substring(5);
+
+                        // Busca en la lista 'emails' para ver si el alias de correo existe
+                        List<string> emailList = ExpandAlias(alias);
+
+                        // Responde al cliente
+                        if (emailList.Count > 0)
+                        {
+                            foreach (string email in emailList)
+                            {
+                                writer.WriteLine("250 " + email);
+                            }
+                        }
+                        else
+                        {
+                            writer.WriteLine("550 No such user");
+                        }
+                    }
+                    else if (line.StartsWith("NOOP"))
+                    {
+                        // No realiza ninguna operación y responde al cliente
                         writer.WriteLine("250 OK");
                     }
                     else if (line.StartsWith("DATA"))
@@ -117,6 +170,39 @@ namespace program
         {
             _isRunning = false;
             _listener.Stop();
+        }
+
+        private bool VerifyEmail(string email)
+        {
+            // Busca en la lista 'emails' para ver si la dirección de correo electrónico existe.
+            foreach (Email e in emails)
+            {
+                if (e.From == email || e.To == email)
+                {
+                    // Si se encuentra la dirección de correo electrónico, devuelve true.
+                    return true;
+                }
+            }
+
+            // Si no se encuentra la dirección de correo electrónico, devuelve false.
+            return false;
+        }
+
+        private List<string> ExpandAlias(string alias)
+        {
+            List<string> emailList = new List<string>();
+
+            // Busca en la lista 'emails' para ver si el alias de correo existe
+            foreach (Email e in emails)
+            {
+                if (e.From.Contains(alias) || e.To.Contains(alias))
+                {
+                    emailList.Add(e.From);
+                    emailList.Add(e.To);
+                }
+            }
+
+            return emailList;
         }
     }
 }
