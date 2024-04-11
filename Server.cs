@@ -8,6 +8,7 @@ namespace program
         private TcpListener _listener;
         private bool _isRunning;
         public List<Email> emails = new List<Email>();
+        public List<Client> clients = new List<Client>();
 
         // Variable para almacenar el correo electrónico
         private Email LastEmail { get; set; } = new Email { };
@@ -61,17 +62,17 @@ namespace program
                     }
                     else if (line.StartsWith("HELO"))
                     {
-                        writer.WriteLine("250 Hello");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("MAIL FROM:"))
                     {
                         from = line.Substring(10);
-                        writer.WriteLine("250 OK");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("RCPT TO:"))
                     {
                         to = line.Substring(8);
-                        writer.WriteLine("250 OK");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("RSET"))
                     {

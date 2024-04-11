@@ -39,7 +39,6 @@ class Program
         };
         win.Add(scrollView);
         SmtpServer server = new SmtpServer();
-        List<Client> clients = new List<Client>();
         Client mainClient = null!;
         string lastView = "";
 
@@ -81,7 +80,7 @@ class Program
 
                     string userNameToFind = loginText.Text.ToString()!;
                     Client foundClient = null!;
-                    foreach (Client client in clients)
+                    foreach (Client client in server.clients)
                     {
                         if (client.username == userNameToFind)
                         {
@@ -153,7 +152,7 @@ class Program
                 {
                     string userName = createText.Text.ToString()!;
                     Client client = new Client(userName);
-                    clients.Add(client);
+                    server.clients.Add(client);
                     MessageBox.Query(20, 7, "Create Client", $"Cliente {userName} creado.", "Ok");
 
                 }
@@ -239,7 +238,7 @@ class Program
                         
                             string userNameToFind = email.To;
                             Client foundClient = null!;
-                            foreach (Client client in clients)
+                            foreach (Client client in server.clients)
                             {
                                 if (client.username == userNameToFind)
                                 {
@@ -318,7 +317,7 @@ class Program
                     if (list.Count() != 0)
                     {
                         Client foundClient = null!;
-                        foreach (Client client in clients)
+                        foreach (Client client in server.clients)
                         {
                             if (client.username == userNameToFind)
                             {
