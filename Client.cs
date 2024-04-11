@@ -39,29 +39,29 @@ namespace program
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"RSET\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"RSET\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"VRFY {fromEmail}\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"VRFY {fromEmail}\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"EXPN {toEmail}\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"EXPN {toEmail}\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"NOOP\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"NOOP\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
             // Envía el comando MAIL FROM al servidor SMTP: Este comando indica el remitente del correo electrónico. El servidor debe responder con un código de estado 250 para indicar 
             // que el remitente es aceptable.
@@ -79,21 +79,50 @@ namespace program
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            // Envía el comando DATA al servidor SMTP: Este comando indica al servidor que el cliente está listo para enviar el cuerpo del correo electrónico. El servidor debe responder 
-            // con un código de estado 354 para indicar que está listo para recibir los datos.
+            // // Envía el comando DATA al servidor SMTP: Este comando indica al servidor que el cliente está listo para enviar el cuerpo del correo electrónico. El servidor debe responder 
+            // // con un código de estado 354 para indicar que está listo para recibir los datos.
+            // dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
+
+            // // Envía el cuerpo del correo electrónico al servidor SMTP: En este punto, se envía el asunto y el cuerpo del correo electrónico. El cuerpo del correo electrónico se termina 
+            // // con una línea que contiene solo un punto (.\r\n). El servidor debe responder con un código de estado 250 para indicar que el correo electrónico ha sido aceptado para su entrega.
+            // dataBuffer = Encoding.ASCII.GetBytes($"Subject: {subject}\r\n\r\n{body}\r\n.\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
+
+
+            // Construye el encabezado del correo electrónico
+            string emailHeader = $"From: {fromEmail}\r\n" +
+                                $"To: {toEmail}\r\n" +
+                                $"Date: {email.Received}\r\n" +
+                                $"Subject: {subject}\r\n" +
+                                "\r\n"; // Línea vacía para separar el encabezado del cuerpo
+
+            // Construye la sección DATA completa
+            string dataSection = emailHeader + body + "\r\n.\r\n";
+
+            // Convierte la sección DATA a bytes y la envía
             dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
             ns.Write(dataBuffer, 0, dataBuffer.Length);
             dataBuffer = new byte[1024];
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            // Envía el cuerpo del correo electrónico al servidor SMTP: En este punto, se envía el asunto y el cuerpo del correo electrónico. El cuerpo del correo electrónico se termina 
-            // con una línea que contiene solo un punto (.\r\n). El servidor debe responder con un código de estado 250 para indicar que el correo electrónico ha sido aceptado para su entrega.
-            dataBuffer = Encoding.ASCII.GetBytes($"Subject: {subject}\r\n\r\n{body}\r\n.\r\n");
+            dataBuffer = Encoding.ASCII.GetBytes(dataSection);
             ns.Write(dataBuffer, 0, dataBuffer.Length);
             dataBuffer = new byte[1024];
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+
+
+
+
 
             // Envía el comando QUIT al servidor SMTP: Este comando indica al servidor que el cliente ha terminado de enviar comandos. El servidor debe responder con 
             // un código de estado 221 para indicar que está cerrando la conexión.
