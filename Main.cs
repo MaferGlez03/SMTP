@@ -1,4 +1,4 @@
-using NStack;
+﻿using NStack;
 using program;
 
 using System;
@@ -38,15 +38,17 @@ class Program
             Height = Dim.Percent(100)
         };
         win.Add(scrollView);
-        SmtpServer server = new SmtpServer();
         Client mainClient = null!;
-        string lastView = "";
+        List<Client> clients = new List<Client>();
 
-        Thread serverThread = new Thread(new ThreadStart(server.Start));
-        serverThread.Start();
+
+        // SmtpServer server = new SmtpServer();
+
+        // Thread serverThread = new Thread(new ThreadStart(server.Start));
+        // serverThread.Start();
+
 
         // Ejemplo de un campo de texto para el inicio de sesión
-
         var loginButton = new Button("Login") { X = 60, Y = 2 };
         loginButton.Clicked += () =>
         {
@@ -77,10 +79,9 @@ class Program
             {
                 try
                 {
-
                     string userNameToFind = loginText.Text.ToString()!;
                     Client foundClient = null!;
-                    foreach (Client client in server.clients)
+                    foreach (Client client in clients)
                     {
                         if (client.username == userNameToFind)
                         {
@@ -92,23 +93,17 @@ class Program
                     if (foundClient == null)
                     {
                         throw new Exception($"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'");
-
-
                     }
                     else
                     {
                         mainClient = foundClient;
-
                         MessageBox.Query(20, 7, "Login", "Login exitoso", "Ok");
                     }
                 }
                 catch (Exception e)
                 {
-
                     MessageBox.Query(20, 7, "Error", e.Message, "Ok");
                 }
-
-
             };
             backButton.Clicked += () =>
             {
@@ -118,7 +113,6 @@ class Program
             Application.Run(newWindow);
         };
         win.Add(loginButton);
-
 
 
         // Por ejemplo, un botón para crear un nuevo cliente
@@ -152,24 +146,23 @@ class Program
                 {
                     string userName = createText.Text.ToString()!;
                     Client client = new Client(userName);
-                    server.clients.Add(client);
                     MessageBox.Query(20, 7, "Create Client", $"Cliente {userName} creado.", "Ok");
-
+                    clients.Add(client);
                 }
-                catch (System.Exception)
+                catch (Exception)
                 {
-
                     throw;
                 }
             };
             backButton.Clicked += () =>
-           {
-               Application.RequestStop();
-           };
+            {
+                Application.RequestStop();
+            };
             // Hacer visible la nueva ventana
             Application.Run(newWindow);
         };
         win.Add(createClientButton);
+
 
         // Ejemplo de un botón para enviar un correo electrónico
         var sendEmailButton = new Button("Send Email") { X = 60, Y = 6 };
@@ -177,8 +170,6 @@ class Program
         {
             if (mainClient != null)
             {
-
-
                 Application.Top.Clear();
                 var newWindow = new Window("Send email")
                 {
@@ -188,7 +179,6 @@ class Program
                     Height = Dim.Fill()
                 };
 
-
                 var portLabel = new Label("Puerto:") { X = 50, Y = 1 };
                 var port = new TextField("25") { X = 50, Y = 2, Width = 40 };
                 newWindow.Add(portLabel, port);
@@ -196,7 +186,6 @@ class Program
                 var usernameLabel = new Label("Nombre de usuario:") { X = 3, Y = 1 };
                 var username = new TextField(mainClient.username) { X = 3, Y = 2, Width = 40 };
                 newWindow.Add(usernameLabel, username);
-
 
                 var recipientLabel = new Label("Destinatario:") { X = 3, Y = 4 };
                 var recipient = new TextField("") { X = 3, Y = 5, Width = 40 };
@@ -221,9 +210,7 @@ class Program
                 {
                     try
                     {
-
                         {
-
                             Email email = new Email()
                             {
                                 From = username.Text.ToString()!,
@@ -234,31 +221,10 @@ class Program
                                 Unread = true,
                                 HasAttachment = false,
                                 IsImportant = false
-                            };
-                        
-                            string userNameToFind = email.To;
-                            Client foundClient = null!;
-                            foreach (Client client in server.clients)
-                            {
-                                if (client.username == userNameToFind)
-                                {
-                                    foundClient = client;
-                                    break;
-                                }
-                            }
+                            };                     
 
-                            if (foundClient == null)
-                            {
-                                MessageBox.Query(20, 7, "Error", $"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'", "Ok");
-
-
-                            }
-
-                            server.emails.Add(email);
-                            foundClient.SendEmail(email);
+                            mainClient.SendEmail(email);
                             mainClient.mailbox.SendEmails.Add(email);
-                            //mainClient.mailbox.DraftEmails.Remove(email);
-
                             MessageBox.Query(20, 7, "Éxito", "Correo enviado exitosamente.", "Ok");
                         }
                     }
@@ -279,13 +245,13 @@ class Program
         };
         win.Add(sendEmailButton);
 
+
         // Ejemplo de un botón para recibir un correo electrónico
         var receiveEmailButton = new Button("Receive Email") { X = 60, Y = 8 };
         receiveEmailButton.Clicked += () =>
         {
             if (mainClient != null)
             {
-
                 Application.Top.Clear();
                 var newWindow = new Window("Receive email")
                 {
@@ -301,50 +267,20 @@ class Program
                 newWindow.Add(receiveEmailButton);
                 receiveEmailButton.Clicked += () =>
                 {
-                    List<int> list = new List<int>();
-                    string userNameToFind = mainClient!.username;
-
-                    int i = 0;
-                    foreach (Email email in server.emails)
+                    try
                     {
-                        if (email.To == userNameToFind)
-                        {
-                            list.Add(i);
-                        }
-                        i++;
-                    }
-
-                    if (list.Count() != 0)
-                    {
-                        Client foundClient = null!;
-                        foreach (Client client in server.clients)
-                        {
-                            if (client.username == userNameToFind)
-                            {
-                                foundClient = client;
-                                break;
-                            }
-                        }
-                        if (foundClient == null)
-                        {
-                            MessageBox.Query(20, 7, "Error", $"No se encontró ningún cliente con el nombre de usuario '{userNameToFind}'", "Ok");
-                        }
-
-                        for (int j = 0; j < list.Count(); j++)
-                        {
-                            foundClient.mailbox.ReceivedEmails.Add(foundClient.ReceiveEmail(j));
-                        }
+                        mainClient.mailbox.ReceivedEmails.Add(mainClient.ReceiveEmail());  
                         MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
                     }
-                    else
+                    catch (Exception)
                     {
                         MessageBox.Query(20, 7, "Error", "No se encontró ningún email para recibir", "Ok");
                     }
                 };
                 backButton.Clicked += () =>
-               {
-                   Application.RequestStop();
-               };
+                {
+                    Application.RequestStop();
+                };
                 Application.Run(newWindow);
             }
             else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
@@ -358,7 +294,6 @@ class Program
         {
             if (mainClient != null)
             {
-
                 Application.Top.Clear();
                 var newWindow = new Window("View Folder")
                 {
@@ -379,16 +314,13 @@ class Program
                 var radioGroup = new RadioGroup(rect, radioLabels, 0);
                 newWindow.Add(radioGroup);
 
-
                 viewFolderButton.Clicked += () =>
                 {
                     if (mainClient != null)
                     {
-                        
-                        string listView;
                         var selectedIndex = radioGroup.SelectedItem;
                         var selectedLabel = radioLabels[selectedIndex];
-                        listView = selectedLabel.ToString()!;
+                        string listView = selectedLabel.ToString()!;
                         List<Email> list = new List<Email>();
                         if (listView == "receive") list = mainClient.mailbox.ReceivedEmails;
                         else if (listView == "send") list = mainClient.mailbox.SendEmails;
@@ -422,7 +354,6 @@ class Program
                         newWindow.Add(viewButton);
                         viewButton.Clicked += () =>
                         {
-                            
                             var selectedIndex = radioGroup1.SelectedItem;
                             var selectedLabel = radioLabels1[selectedIndex].ToString();
                             string[] partes = selectedLabel!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -430,11 +361,10 @@ class Program
                             for (int i = 1; i < partes.Length - 3; i++)
                             {
                                 subjectToFind += partes[i] + " ";
-
                             }
                             string sinUltimoCaracter = subjectToFind.Substring(0, subjectToFind.Length - 1);
-                            System.Console.WriteLine(sinUltimoCaracter);
-                            System.Console.WriteLine(sinUltimoCaracter[sinUltimoCaracter.Length - 1]);
+                            Console.WriteLine(sinUltimoCaracter);
+                            Console.WriteLine(sinUltimoCaracter[sinUltimoCaracter.Length - 1]);
                             Email foundEmail = null!;
                             foreach (Email email in list)
                             {
@@ -452,19 +382,14 @@ class Program
                                 Height = 25
                             };
                             newWindow.Add(emailprinter);
-
-
                         };
-
                     };
-
-
                 };
 
                 backButton.Clicked += () =>
-              {
-                  Application.RequestStop();
-              };
+                {
+                    Application.RequestStop();
+                };
                 Application.Run(newWindow);
             }
             else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
@@ -474,7 +399,7 @@ class Program
         var exitButton = new Button("Exit") { X = 60, Y = 12 };
         exitButton.Clicked += () =>
         {
-            server.Stop();
+            // server.Stop();
             Application.RequestStop();
 
         };
