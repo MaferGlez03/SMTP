@@ -146,8 +146,8 @@ class Program
                 {
                     string userName = createText.Text.ToString()!;
                     Client client = new Client(userName);
-                    MessageBox.Query(20, 7, "Create Client", $"Cliente {userName} creado.", "Ok");
                     clients.Add(client);
+                    MessageBox.Query(20, 7, "Create Client", $"Cliente {userName} creado.", "Ok");
                 }
                 catch (Exception)
                 {
@@ -206,192 +206,132 @@ class Program
                 var backButton = new Button("Back") { X = 20, Y = 17 };
                 newWindow.Add(backButton);
 
-            // var createButton = new Button("Create Message ✉️") { X = 6, Y = 17 };
-            // createButton.Clicked += () =>
-            // {
-            //     Email email = new Email()
-            //     {
-            //         From = username.Text.ToString()!,
-            //         To = recipient.Text.ToString()!,
-            //         Subject = subject.Text.ToString()!,
-            //         Content = body.Text.ToString()!,
-            //         Received = DateTime.Now,
-            //         Unread = true,
-            //         HasAttachment = false,
-            //         IsImportant = false
-            //     };
-            //     //email.AttachmentPath = attachment.Text.ToString()!;
-            //     mainClient.mailbox.DraftEmails.Add(email);
-            //     MessageBox.Query(20, 7, "Éxito", "Correo creado exitosamente.", "Ok");
-            // };
-            var sendButton = new Button("Send ✉️") { X = 6, Y = 17 };
-            sendButton.Clicked += () =>
-            {
-                try
-                {
 
-                    {
-                        // client.Credentials = new System.Net.NetworkCredential(username.Text.ToString(), password.Text.ToString());
-                        // client.EnableSsl = true;
-
-                        Email email = new Email()
-                        {
-                            From = username.Text.ToString()!,
-                            To = recipient.Text.ToString()!,
-                            Subject = subject.Text.ToString()!,
-                            Content = body.Text.ToString()!,
-                            Received = DateTime.Now,
-                            Unread = true,
-                            HasAttachment = false,
-                            IsImportant = false
-                        };
-                        
-
-                        
-                        mainClient.SendEmail(email);
-                        mainClient.mailbox.SendEmails.Add(email);
-                        MessageBox.Query(20, 7, "Éxito", "Correo enviado exitosamente.", "Ok");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Query(20, 7, "Error", "Error al enviar el correo: " + ex.Message, "Ok");
-                }
-            };
-            newWindow.Add(sendButton);
-            backButton.Clicked += () =>
-           {
-               Application.RequestStop();
-           };
-            // Hacer visible la nueva ventana
-            Application.Run(newWindow);
-        };
-        win.Add(sendEmailButton);
-
-
-        // Ejemplo de un botón para recibir un correo electrónico
-        var receiveEmailButton = new Button("Receive Email") { X = 60, Y = 8 };
-        receiveEmailButton.Clicked += () =>
-        {
-            if (mainClient != null)
-            {
-                Application.Top.Clear();
-                var newWindow = new Window("Receive email")
-                {
-                    X = 0,
-                    Y = 0,
-                    Width = Dim.Fill(),
-                    Height = Dim.Fill()
-                };
-
-                var backButton = new Button("Back") { X = 20, Y = 8 };
-                newWindow.Add(backButton);
-                var receiveEmailButton = new Button("Receive Email") { X = 3, Y = 8 };
-                newWindow.Add(receiveEmailButton);
-                receiveEmailButton.Clicked += () =>
+                var sendButton = new Button("Send ✉️") { X = 6, Y = 17 };
+                sendButton.Clicked += () =>
                 {
                     try
                     {
-                        mainClient.mailbox.ReceivedEmails.Add(mainClient.ReceiveEmail());  
-                        MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
+
+                        {
+                            // client.Credentials = new System.Net.NetworkCredential(username.Text.ToString(), password.Text.ToString());
+                            // client.EnableSsl = true;
+
+                            Email email = new Email()
+                            {
+                                From = username.Text.ToString()!,
+                                To = recipient.Text.ToString()!,
+                                Subject = subject.Text.ToString()!,
+                                AttachmentPath = attachment.Text.ToString()!,
+                                Content = body.Text.ToString()!,
+                                Received = DateTime.Now,
+                                Unread = true,
+                                HasAttachment = false,
+                                IsImportant = false
+                            };
+
+
+
+                            mainClient.SendEmail(email);
+                            mainClient.mailbox.SendEmails.Add(email);
+                            MessageBox.Query(20, 7, "Éxito", "Correo enviado exitosamente.", "Ok");
+                        }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        MessageBox.Query(20, 7, "Error", "No se encontró ningún email para recibir", "Ok");
+                        MessageBox.Query(20, 7, "Error", "Error al enviar el correo: " + ex.Message, "Ok");
                     }
                 };
+                newWindow.Add(sendButton);
                 backButton.Clicked += () =>
-                {
-                    Application.RequestStop();
-                };
+               {
+                   Application.RequestStop();
+               };
+                // Hacer visible la nueva ventana
                 Application.Run(newWindow);
             }
-            else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
-        };
-        win.Add(receiveEmailButton);
-
-
-        // Ejemplo de un botón para visualizar carpetas de correo
-        var viewFolderButton = new Button("View Folder") { X = 60, Y = 10 };
-        viewFolderButton.Clicked += () =>
-        {
-            if (mainClient != null)
+            else 
             {
-                Application.Top.Clear();
-                var newWindow = new Window("View Folder")
+                MessageBox.Query(20, 7, "Error", "Necesita Registrarse", "Ok");
+            }
+        };
+            win.Add(sendEmailButton);
+
+
+            // Ejemplo de un botón para recibir un correo electrónico
+            var receiveEmailButton = new Button("Receive Email") { X = 60, Y = 8 };
+            receiveEmailButton.Clicked += () =>
+            {
+                if (mainClient != null)
                 {
-                    X = 0,
-                    Y = 0,
-                    Width = Dim.Fill(),
-                    Height = Dim.Fill()
-                };
-
-                var backButton = new Button("Back") { X = 20, Y = 10 };
-                newWindow.Add(backButton);
-                var viewFolderButton = new Button("View Folder") { X = 3, Y = 10 };
-                newWindow.Add(viewFolderButton);
-                var rect = new Rect(1, 1, 20, 3);
-
-                // Definir las etiquetas de los botones de radio
-                var radioLabels = new ustring[] { "send", "receive"};
-                var radioGroup = new RadioGroup(rect, radioLabels, 0);
-                newWindow.Add(radioGroup);
-
-                viewFolderButton.Clicked += () =>
-                {
-                    if (mainClient != null)
+                    Application.Top.Clear();
+                    var newWindow = new Window("Receive email")
                     {
-                        Application.Top.Clear();
-                        var newWindow1 = new Window("Folder")
-                        {
-                            X = 0,
-                            Y = 0,
-                            Width = Dim.Fill(),
-                            Height = Dim.Fill()
-                        };
+                        X = 0,
+                        Y = 0,
+                        Width = Dim.Fill(),
+                        Height = Dim.Fill()
+                    };
 
-                        var backButton = new Button("Back") { X = 100, Y = 8 };
-                        newWindow1.Add(backButton);
-
-                        string listView;
-                        var selectedIndex = radioGroup.SelectedItem;
-                        var selectedLabel = radioLabels[selectedIndex];
-                        listView = selectedLabel.ToString()!;
-                        List<Email> list = new List<Email>();
-                        if (listView == "receive") list = mainClient.mailbox.ReceivedEmails;
-                        else if (listView == "send") list = mainClient.mailbox.SendEmails;
-
-                        var head = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "De", "Asunto", ""))
+                    var backButton = new Button("Back") { X = 20, Y = 8 };
+                    newWindow.Add(backButton);
+                    var receiveEmailButton = new Button("Receive Email") { X = 3, Y = 8 };
+                    newWindow.Add(receiveEmailButton);
+                    receiveEmailButton.Clicked += () =>
+                    {
+                        try
                         {
-                            X = 3,
-                            Y = 0,
-                            Width = Dim.Fill(),
-                            Height = 1
-                        };
-                        var head1 = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "Para", "Asunto", ""))
-                        {
-                            X = 3,
-                            Y = 0,
-                            Width = Dim.Fill(),
-                            Height = 1
-                        };
-                        if (listView == "send") newWindow1.Add(head1);
-                        else if (listView == "receive") newWindow1.Add(head);
-
-                        var rect1 = new Rect(3, 3, 20, 3);
-                        var radioLabels1 = new List<ustring>();
-                        foreach (var email in list)
-                        {
-                            radioLabels1.Add(string.Format("{0,-30} {1,-30} {2,-30}", email.To, email.Subject, email.Received));
+                            mainClient.mailbox.ReceivedEmails.Add(mainClient.ReceiveEmail());
+                            MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
                         }
-                        var radioGroup1 = new RadioGroup(rect1, radioLabels1.ToArray(), 0);
-                        newWindow1.Add(radioGroup1);
-                        var viewButton = new Button("View Email") { X = 100, Y = 5 };
-                        newWindow1.Add(viewButton);
-                        viewButton.Clicked += () =>
+                        catch (Exception)
+                        {
+                            MessageBox.Query(20, 7, "Error", "No se encontró ningún email para recibir", "Ok");
+                        }
+                    };
+                    backButton.Clicked += () =>
+                    {
+                        Application.RequestStop();
+                    };
+                    Application.Run(newWindow);
+                }
+                else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
+            };
+            win.Add(receiveEmailButton);
+
+
+            // Ejemplo de un botón para visualizar carpetas de correo
+            var viewFolderButton = new Button("View Folder") { X = 60, Y = 10 };
+            viewFolderButton.Clicked += () =>
+            {
+                if (mainClient != null)
+                {
+                    Application.Top.Clear();
+                    var newWindow = new Window("View Folder")
+                    {
+                        X = 0,
+                        Y = 0,
+                        Width = Dim.Fill(),
+                        Height = Dim.Fill()
+                    };
+
+                    var backButton = new Button("Back") { X = 20, Y = 10 };
+                    newWindow.Add(backButton);
+                    var viewFolderButton = new Button("View Folder") { X = 3, Y = 10 };
+                    newWindow.Add(viewFolderButton);
+                    var rect = new Rect(1, 1, 20, 3);
+
+                    // Definir las etiquetas de los botones de radio
+                    var radioLabels = new ustring[] { "send", "receive" };
+                    var radioGroup = new RadioGroup(rect, radioLabels, 0);
+                    newWindow.Add(radioGroup);
+
+                    viewFolderButton.Clicked += () =>
+                    {
+                        if (mainClient != null)
                         {
                             Application.Top.Clear();
-                            var newWindow2 = new Window("Email")
+                            var newWindow1 = new Window("Folder")
                             {
                                 X = 0,
                                 Y = 0,
@@ -399,78 +339,129 @@ class Program
                                 Height = Dim.Fill()
                             };
 
-                            var backButton1 = new Button("Back") { X = 20, Y = 5 };
-                            newWindow2.Add(backButton1);
+                            var backButton = new Button("Back") { X = 100, Y = 8 };
+                            newWindow1.Add(backButton);
 
-                            var selectedIndex = radioGroup1.SelectedItem;
-                            var selectedLabel = radioLabels1[selectedIndex].ToString();
-                            string[] partes = selectedLabel!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            string subjectToFind = "";
-                            for (int i = 1; i < partes.Length - 3; i++)
-                            {
-                                subjectToFind += partes[i] + " ";
+                            string listView;
+                            var selectedIndex = radioGroup.SelectedItem;
+                            var selectedLabel = radioLabels[selectedIndex];
+                            listView = selectedLabel.ToString()!;
+                            List<Email> list = new List<Email>();
+                            if (listView == "receive") list = mainClient.mailbox.ReceivedEmails;
+                            else if (listView == "send") list = mainClient.mailbox.SendEmails;
 
-                            }
-                            string sinUltimoCaracter = subjectToFind.Substring(0, subjectToFind.Length - 1);
-                            
-                            Email foundEmail = null!;
-                            foreach (Email email in list)
-                            {
-                                if (email.Subject == sinUltimoCaracter)
-                                {
-                                    foundEmail = email;
-                                    break;
-                                }
-                            }
-
-                            var emailprinter = new Label(string.Format("De: {0}\n\nPara: {1}\n\nAsunto: {2}\n\n\n{3}", foundEmail.From, foundEmail.To, foundEmail.Subject, foundEmail.Content))
+                            var head = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "De", "Asunto", ""))
                             {
                                 X = 3,
                                 Y = 0,
                                 Width = Dim.Fill(),
-                                Height = 25
+                                Height = 1
                             };
-                            newWindow2.Add(emailprinter);
-                            newWindow2.Add(backButton);
-                            backButton1.Clicked += () =>
+                            var head1 = new Label(string.Format("{0,-30} {1,-30} {2,-30}", "Para", "Asunto", ""))
                             {
-                            Application.RequestStop();
+                                X = 3,
+                                Y = 0,
+                                Width = Dim.Fill(),
+                                Height = 1
                             };
-                            Application.Run(newWindow2);
+                            if (listView == "send") newWindow1.Add(head1);
+                            else if (listView == "receive") newWindow1.Add(head);
+
+                            var rect1 = new Rect(3, 3, 20, 3);
+                            var radioLabels1 = new List<ustring>();
+                            foreach (var email in list)
+                            {
+                                radioLabels1.Add(string.Format("{0,-30} {1,-30} {2,-30}", email.To, email.Subject, email.Received));
+                            }
+                            var radioGroup1 = new RadioGroup(rect1, radioLabels1.ToArray(), 0);
+                            newWindow1.Add(radioGroup1);
+                            var viewButton = new Button("View Email") { X = 100, Y = 5 };
+                            newWindow1.Add(viewButton);
+                            viewButton.Clicked += () =>
+                            {
+                                Application.Top.Clear();
+                                var newWindow2 = new Window("Email")
+                                {
+                                    X = 0,
+                                    Y = 0,
+                                    Width = Dim.Fill(),
+                                    Height = Dim.Fill()
+                                };
+
+                                var backButton1 = new Button("Back") { X = 20, Y = 5 };
+                                newWindow2.Add(backButton1);
+
+                                var selectedIndex = radioGroup1.SelectedItem;
+                                var selectedLabel = radioLabels1[selectedIndex].ToString();
+                                string[] partes = selectedLabel!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                string subjectToFind = "";
+                                for (int i = 1; i < partes.Length - 3; i++)
+                                {
+                                    subjectToFind += partes[i] + " ";
+
+                                }
+                                string sinUltimoCaracter = subjectToFind.Substring(0, subjectToFind.Length - 1);
+
+                                Email foundEmail = null!;
+                                foreach (Email email in list)
+                                {
+                                    if (email.Subject == sinUltimoCaracter)
+                                    {
+                                        foundEmail = email;
+                                        break;
+                                    }
+                                }
+
+                                var emailprinter = new Label(string.Format("De: {0}\n\nPara: {1}\n\nAsunto: {2}\n\n\n{3}", foundEmail.From, foundEmail.To, foundEmail.Subject, foundEmail.Content))
+                                {
+                                    X = 3,
+                                    Y = 0,
+                                    Width = Dim.Fill(),
+                                    Height = 25
+                                };
+                                newWindow2.Add(emailprinter);
+                                newWindow2.Add(backButton);
+                                backButton1.Clicked += () =>
+                                {
+                                    Application.RequestStop();
+                                };
+                                Application.Run(newWindow2);
 
 
+                            };
+                            backButton.Clicked += () =>
+                            {
+                                Application.RequestStop();
+                            };
+                            Application.Run(newWindow1);
+
                         };
-                        backButton.Clicked += () =>
-                        {
-                            Application.RequestStop();
-                        };
-                        Application.Run(newWindow1);
+
 
                     };
 
+                    backButton.Clicked += () =>
+                  {
+                      Application.RequestStop();
+                  };
+                    Application.Run(newWindow);
+                }
+                else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
+            };
+            win.Add(viewFolderButton);
 
-                };
+            var exitButton = new Button("Exit") { X = 60, Y = 12 };
+            exitButton.Clicked += () =>
+            {
+                // server.Stop();
+                Application.RequestStop();
 
-                backButton.Clicked += () =>
-              {
-                  Application.RequestStop();
-              };
-                Application.Run(newWindow);
-            }
-            else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
-        };
-        win.Add(viewFolderButton);
-
-        var exitButton = new Button("Exit") { X = 60, Y = 12 };
-        exitButton.Clicked += () =>
-        {
-            // server.Stop();
-            Application.RequestStop();
-
-        };
-        win.Add(exitButton);
+            };
+            win.Add(exitButton);
+        
         Application.Run();
     }
 }
+
 
 
