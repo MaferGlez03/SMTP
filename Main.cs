@@ -281,9 +281,6 @@ class Program
                     {
                         try
                         {
-                            var mensajito = mainClient.ReceiveEmail();
-                            //System.Console.WriteLine("FROM   "+mensajito.From + " TO  " + mensajito.To +"  SUBJECT   "+ mensajito.Subject + "   Content    " + mensajito.Content);
-                            mainClient.mailbox.ReceivedEmails.Add(mensajito);
                             MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
                         }
                         catch (Exception)
