@@ -8,6 +8,7 @@ namespace program
         private TcpListener _listener;  
         private bool _isRunning;
         public List<Email> emails = new List<Email>();
+        public List<Client> clients = new List<Client>();
 
         // Variable para almacenar el correo electrónico
         private Email LastEmail { get; set; } = new Email { };
@@ -28,7 +29,7 @@ namespace program
                 //Esto evita aceptar una nueva conexión después de que el TcpListener haya sido detenido.
                 if (!_listener.Pending())
                 {
-                    Thread.Sleep(1500); // Espera medio segundo antes de comprobar de nuevo
+                    Thread.Sleep(1500); // Espera segundo y medio antes de comprobar de nuevo
                     continue;
                 }
                 var client = _listener.AcceptTcpClient();
@@ -48,30 +49,42 @@ namespace program
 
                     if (line.StartsWith("RETR"))
                     {
-                        int emailNumber = int.Parse(line.Substring(5));
+                        string username = line.Substring(5);
+                        
+                        
+                        Console.WriteLine("Mensaje recibido por server, listo para buscar");
+                        Console.WriteLine(username);
+
                         if (emails.Count > 0)
                         {
-                            Email email = emails[emailNumber];
+                            foreach (Email email in emails)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine(email.To);
 
-                            writer.WriteLine(email.ToString());
-                            writer.Flush();
-                            break;
+                                if (email.To == username)
+                                {
+                                    writer.WriteLine(email.ToString());
+                                    writer.Flush();
+                                    break;
+                                }
+                            }
                         }
-                        return;
+                        break;
                     }
                     else if (line.StartsWith("HELO"))
                     {
-                        writer.WriteLine("250 Hello");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("MAIL FROM:"))
                     {
                         from = line.Substring(10);
-                        writer.WriteLine("250 OK");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("RCPT TO:"))
                     {
                         to = line.Substring(8);
-                        writer.WriteLine("250 OK");
+                        writer.WriteLine("250 Ok");
                     }
                     else if (line.StartsWith("RSET"))
                     {
@@ -150,6 +163,8 @@ namespace program
                             IsImportant = false
                         };
 
+                        emails.Add(LastEmail);
+
                         writer.WriteLine("250 OK");
                     }
                     else if (line.StartsWith("QUIT"))
@@ -204,3 +219,185 @@ namespace program
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// public class SmtpServer
+//     {
+//         private TcpListener _listener;
+//         private bool _isRunning;
+//         public List<Email> emails = new List<Email>();
+//         public List<Client> clients = new List<Client>();
+//         private Email LastEmail { get; set; } = new Email { };
+
+//         public SmtpServer()
+//         {
+//             _listener = new TcpListener(IPAddress.Any, 25);
+//             _isRunning = false;
+//         }
+
+//         public void Start()
+//         {
+//             _listener.Start();
+//             _isRunning = true;
+
+//             while (_isRunning)
+//             {
+//                 if (!_listener.Pending())
+//                 {
+//                     Thread.Sleep(500);
+//                     continue;
+//                 }
+//                 var client = _listener.AcceptTcpClient();
+//                 var stream = client.GetStream();
+//                 var reader = new StreamReader(stream);
+//                 var writer = new StreamWriter(stream);
+
+//                 writer.WriteLine("220 smtp.example.com ESMTP Postfix");
+//                 writer.Flush();
+
+//                 string from = "", to = "", subject = "";
+
+//                 while (true)
+//                 {
+//                     string line = "";
+//                     line += reader.ReadLine();
+
+//                     if (line.StartsWith("RETR"))
+//                     {
+//                         int emailNumber = int.Parse(line.Substring(5));
+//                         if (emails.Count > 0)
+//                         {
+//                             Email email = emails[emailNumber];
+
+//                             writer.WriteLine(email.ToString());
+//                             writer.Flush();
+//                             break;
+//                         }
+//                         return;
+//                     }
+//                     else if (line.StartsWith("HELO"))
+//                     {
+//                         writer.WriteLine("250 Ok");
+//                     }
+//                     else if (line.StartsWith("MAIL FROM:"))
+//                     {
+//                         from = line.Substring(10);
+//                         writer.WriteLine("250 Ok");
+//                     }
+//                     else if (line.StartsWith("RCPT TO:"))
+//                     {
+//                         to = line.Substring(8);
+//                         writer.WriteLine("250 Ok");
+//                     }
+//                     else if (line.StartsWith("DATA"))
+//                     {
+//                         writer.WriteLine("354 End data with <CR><LF>.<CR><LF>");
+
+//                         while (!line.EndsWith("\r\n.\r\n"))
+//                         {
+//                             line += reader.ReadLine() + "\r\n";
+//                             if (line.StartsWith("Subject: "))
+//                             {
+//                                 subject = line.Substring(9);
+//                             }
+//                         }
+
+//                         LastEmail = new Email
+//                         {
+//                             From = from,
+//                             To = to,
+//                             Subject = subject,
+//                             Content = line,
+//                             Received = DateTime.Now,
+//                             Unread = true,
+//                             HasAttachment = false,
+//                             IsImportant = false
+//                         };
+
+//                         writer.WriteLine("250 OK");
+//                     }
+//                     else if (line.StartsWith("QUIT"))
+//                     {
+//                         writer.WriteLine("221 Bye");
+//                         break;
+//                     }
+
+//                     writer.Flush();
+//                 }
+
+//                 client.Close();
+//             }
+//         }
+//         public void Stop()
+//         {
+//             _isRunning = false;
+//             _listener.Stop();
+//         }
+//     }

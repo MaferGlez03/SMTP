@@ -12,13 +12,14 @@ namespace program
             username = userName;
             mailbox = new Mailbox();
         }
+        string server = "192.168.192.204";
+        int port = 25; // Puerto SMTP por defecto
 
         public void SendEmail(Email email)
         {
             // Establece los parámetros del correo electrónico: Define el servidor SMTP (localhost), el puerto SMTP (25), el correo electrónico del remitente (this.From), 
             // el correo electrónico del destinatario ("destinatario@example.com"), el asunto del correo electrónico (this.Subject) y el cuerpo del correo electrónico (this.Content).
-            string server = "localhost";
-            int port = 25; // Puerto SMTP por defecto
+            
             string fromEmail = email.From;
             string toEmail = email.To; // Deberías agregar un campo 'To' en tu clase 'Email'
             string subject = email.Subject;
@@ -53,29 +54,29 @@ namespace program
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"RSET\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"RSET\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"VRFY {fromEmail}\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"VRFY {fromEmail}\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"EXPN {toEmail}\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"EXPN {toEmail}\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            dataBuffer = Encoding.ASCII.GetBytes($"NOOP\r\n");
-            ns.Write(dataBuffer, 0, dataBuffer.Length);
-            dataBuffer = new byte[1024];
-            ns.Read(dataBuffer, 0, dataBuffer.Length);
-            responseString = Encoding.ASCII.GetString(dataBuffer);
+            // dataBuffer = Encoding.ASCII.GetBytes($"NOOP\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
 
             // Envía el comando MAIL FROM al servidor SMTP: Este comando indica el remitente del correo electrónico. El servidor debe responder con un código de estado 250 para indicar 
             // que el remitente es aceptable.
@@ -93,21 +94,50 @@ namespace program
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            // Envía el comando DATA al servidor SMTP: Este comando indica al servidor que el cliente está listo para enviar el cuerpo del correo electrónico. El servidor debe responder 
-            // con un código de estado 354 para indicar que está listo para recibir los datos.
+            // // Envía el comando DATA al servidor SMTP: Este comando indica al servidor que el cliente está listo para enviar el cuerpo del correo electrónico. El servidor debe responder 
+            // // con un código de estado 354 para indicar que está listo para recibir los datos.
+            // dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
+
+            // // Envía el cuerpo del correo electrónico al servidor SMTP: En este punto, se envía el asunto y el cuerpo del correo electrónico. El cuerpo del correo electrónico se termina 
+            // // con una línea que contiene solo un punto (.\r\n). El servidor debe responder con un código de estado 250 para indicar que el correo electrónico ha sido aceptado para su entrega.
+            // dataBuffer = Encoding.ASCII.GetBytes($"Subject: {subject}\r\n\r\n{body}\r\n.\r\n");
+            // ns.Write(dataBuffer, 0, dataBuffer.Length);
+            // dataBuffer = new byte[1024];
+            // ns.Read(dataBuffer, 0, dataBuffer.Length);
+            // responseString = Encoding.ASCII.GetString(dataBuffer);
+
+
+            // Construye el encabezado del correo electrónico
+            string emailHeader = $"From: {fromEmail}\r\n" +
+                                $"To: {toEmail}\r\n" +
+                                $"Date: {email.Received}\r\n" +
+                                $"Subject: {subject}\r\n" +
+                                "\r\n"; // Línea vacía para separar el encabezado del cuerpo
+
+            // Construye la sección DATA completa
+            string dataSection = emailHeader + body + "\r\n.\r\n";
+
+            // Convierte la sección DATA a bytes y la envía
             dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
             ns.Write(dataBuffer, 0, dataBuffer.Length);
             dataBuffer = new byte[1024];
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
 
-            // Envía el cuerpo del correo electrónico al servidor SMTP: En este punto, se envía el asunto y el cuerpo del correo electrónico. El cuerpo del correo electrónico se termina 
-            // con una línea que contiene solo un punto (.\r\n). El servidor debe responder con un código de estado 250 para indicar que el correo electrónico ha sido aceptado para su entrega.
-            dataBuffer = Encoding.ASCII.GetBytes($"Subject: {subject}\r\n\r\n{body}\r\n.\r\n");
+            dataBuffer = Encoding.ASCII.GetBytes(dataSection);
             ns.Write(dataBuffer, 0, dataBuffer.Length);
             dataBuffer = new byte[1024];
             ns.Read(dataBuffer, 0, dataBuffer.Length);
             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+
+
+
+
 
             // Envía el comando QUIT al servidor SMTP: Este comando indica al servidor que el cliente ha terminado de enviar comandos. El servidor debe responder con 
             // un código de estado 221 para indicar que está cerrando la conexión.
@@ -122,10 +152,9 @@ namespace program
             client.Close();
         }
 
-        public Email ReceiveEmail(int emailNumber)
+        public Email ReceiveEmail()
         {
-            string server = "localhost";
-            int port = 25; // Puerto SMTP por defecto
+            Console.WriteLine("Recibiendo mensaje");
 
             // Crea una nueva conexión TCP al servidor SMTP: Utiliza la clase TcpClient para establecer una nueva conexión al servidor SMTP en el puerto especificado.
             TcpClient client = new TcpClient(server, port);
@@ -136,8 +165,11 @@ namespace program
 
 
             // Envía el comando RETR
-            writer.WriteLine($"RETR {emailNumber}\r\n");
+            writer.WriteLine($"RETR <{username}>\r\n");
             writer.Flush();
+
+            
+            Console.WriteLine("Leyendo respuesta del server");
 
             // Lee la respuesta del servidor
             string[] response = new string[8];
@@ -151,13 +183,11 @@ namespace program
             response[6] = reader.ReadLine()!;
             response[7] = reader.ReadToEnd();
 
-            for (int i = 0; i < response.Length; i++)
-            {
-                Console.WriteLine(response[i]);
-            }
 
             // Parsea la respuesta y crea un objeto Email
             Email email = Auxiliar.ParseEmail(response);
+
+            Console.WriteLine("Mensaje guardado");
 
             return email;
         }
@@ -360,3 +390,182 @@ namespace program
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// public class Client
+//     {
+//         public string username { get; set; }
+//         public Mailbox mailbox { get; set; }
+//         public Client(string userName)
+//         {
+//             username = userName;
+//             mailbox = new Mailbox();
+//         }
+
+//         public void SendEmail(Email email)
+//         {
+//             string server = "localhost";
+//             int port = 25; 
+//             string fromEmail = email.From;
+//             string toEmail = email.To; 
+//             string subject = email.Subject;
+//             string body = email.Content;
+
+//             TcpClient client = new TcpClient(server, port);
+//             NetworkStream ns = client.GetStream();
+//             byte[] dataBuffer;
+//             string responseString;
+
+//             dataBuffer = Encoding.ASCII.GetBytes($"HELO {server}\r\n");
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             dataBuffer = Encoding.ASCII.GetBytes($"MAIL FROM:<{fromEmail}>\r\n");
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             dataBuffer = Encoding.ASCII.GetBytes($"RCPT TO:<{toEmail}>\r\n");
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             string emailHeader = $"From: {fromEmail}\r\n" +
+//                                 $"To: {toEmail}\r\n" +
+//                                 $"Date: {email.Received}\r\n" +
+//                                 $"Subject: {subject}\r\n" +
+//                                 "\r\n"; 
+
+//             string dataSection = emailHeader + body + "\r\n.\r\n";
+
+//             dataBuffer = Encoding.ASCII.GetBytes($"DATA\r\n");
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             dataBuffer = Encoding.ASCII.GetBytes(dataSection);
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             dataBuffer = Encoding.ASCII.GetBytes("QUIT\r\n");
+//             ns.Write(dataBuffer, 0, dataBuffer.Length);
+//             dataBuffer = new byte[1024];
+//             ns.Read(dataBuffer, 0, dataBuffer.Length);
+//             responseString = Encoding.ASCII.GetString(dataBuffer);
+
+//             ns.Close();
+//             client.Close();
+//         }
+
+//         public Email ReceiveEmail(int emailNumber)
+//         {
+//             string server = "localhost";
+//             int port = 25; 
+
+//             TcpClient client = new TcpClient(server, port);
+//             NetworkStream ns = client.GetStream();
+//             var reader = new StreamReader(ns);
+//             var writer = new StreamWriter(ns);
+
+//             writer.WriteLine($"RETR {emailNumber}\r\n");
+//             writer.Flush();
+
+//             string[] response = new string[8];
+//             reader.ReadLine();
+//             response[0] = reader.ReadLine()!;
+//             response[1] = reader.ReadLine()!;
+//             response[2] = reader.ReadLine()!;
+//             response[3] = reader.ReadLine()!;
+//             response[4] = reader.ReadLine()!;
+//             response[5] = reader.ReadLine()!;
+//             response[6] = reader.ReadLine()!;
+//             response[7] = reader.ReadToEnd();
+
+//             for (int i = 0; i < response.Length; i++)
+//             {
+//                 Console.WriteLine(response[i]);
+//             }
+
+//             Email email = Auxiliar.ParseEmail(response);
+
+//             return email;
+//         }
+//     }
+
+//     public class Email
+//     {
+//         public string From { get; set; } = "";
+//         public string To { get; set; } = "";
+//         public string Subject { get; set; } = "";
+//         public string Content { get; set; } = "";
+//         public DateTime Received { get; set; }
+//         public bool Unread { get; set; }
+//         public bool HasAttachment { get; set; }
+//         public bool IsImportant { get; set; }
+
+//         public void Open()
+//         {
+//             Unread = false;
+//             Console.WriteLine("Contenido del correo: " + Content);
+//         }
+
+//         public void ChangePriority()
+//         {
+//             IsImportant = !IsImportant;
+//         }
+
+//         public override string ToString()
+//         {
+//             return $"From: {From}\nTo: {To}\nSubject: {Subject}\nReceived: {Received}\nUnread: {Unread}\nHasAttachment: {HasAttachment}\nEs importante: {IsImportant}\n{Content}";
+//         }
+//     }
