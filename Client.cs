@@ -12,7 +12,7 @@ namespace program
             username = userName;
             mailbox = new Mailbox();
         }
-        string server = "192.168.192.204";
+        string server = "localhost";
         int port = 25; // Puerto SMTP por defecto
 
         public void SendEmail(Email email)

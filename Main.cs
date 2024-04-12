@@ -42,10 +42,10 @@ class Program
         List<Client> clients = new List<Client>();
 
 
-        // SmtpServer server = new SmtpServer();
+        SmtpServer server = new SmtpServer();
 
-        // Thread serverThread = new Thread(new ThreadStart(server.Start));
-        // serverThread.Start();
+        Thread serverThread = new Thread(new ThreadStart(server.Start));
+        serverThread.Start();
 
 
         // Ejemplo de un campo de texto para el inicio de sesión
@@ -281,7 +281,9 @@ class Program
                     {
                         try
                         {
-                            mainClient.mailbox.ReceivedEmails.Add(mainClient.ReceiveEmail());
+                            var mensajito = mainClient.ReceiveEmail();
+                            //System.Console.WriteLine("FROM   "+mensajito.From + " TO  " + mensajito.To +"  SUBJECT   "+ mensajito.Subject + "   Content    " + mensajito.Content);
+                            mainClient.mailbox.ReceivedEmails.Add(mensajito);
                             MessageBox.Query(20, 7, "Receive Email", "Correo(s) recibido(s) satisfactoriamente", "Ok");
                         }
                         catch (Exception)
@@ -453,13 +455,14 @@ class Program
             var exitButton = new Button("Exit") { X = 60, Y = 12 };
             exitButton.Clicked += () =>
             {
-                // server.Stop();
+                server.Stop();
                 Application.RequestStop();
 
             };
             win.Add(exitButton);
         
         Application.Run();
+        //Application.Shutdown();
     }
 }
 
