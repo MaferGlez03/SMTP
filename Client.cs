@@ -23,6 +23,20 @@ namespace program
             string toEmail = email.To; // Deberías agregar un campo 'To' en tu clase 'Email'
             string subject = email.Subject;
             string body = email.Content;
+            string attachmentPath= email.AttachmentPath;
+
+            if (!string.IsNullOrEmpty(attachmentPath))
+            {
+                
+                // Lee el archivo adjunto y lo codifica en base64
+                byte[] attachmentBytes = File.ReadAllBytes(attachmentPath);
+                string attachmentBase64 = Convert.ToBase64String(attachmentBytes);
+                string attachmentContent = File.ReadAllText(attachmentPath);
+
+                // Agrega el archivo adjunto al cuerpo del mensaje
+                body += "\r\n\r\nAttatchment \r\n name=\"" + Path.GetFileName(attachmentPath) + "\"\r\n\r\n" + attachmentContent  + "\r\n\r\n";
+                email.Content= body;
+            }
 
             // Crea una nueva conexión TCP al servidor SMTP: Utiliza la clase TcpClient para establecer una nueva conexión al servidor SMTP en el puerto especificado.
             TcpClient client = new TcpClient(server, port);
@@ -151,6 +165,7 @@ namespace program
     //Crear un email
     public class Email
     {
+        public string AttachmentPath { get; set; } = "";
         public string From { get; set; } = "";
         public string To { get; set; } = "";
         public string Subject { get; set; } = "";
@@ -274,8 +289,7 @@ namespace program
         }
 
 
-        //! Implementar el sistema de carpetas para los correos
-        //? Mejorar el sistema de busqueda de correos (mas rapido y que no distinga entre mayusculas y minusculas y palabras con y sin tilde, etc)
+        
     }
 
     public static class Auxiliar

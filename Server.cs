@@ -5,7 +5,7 @@ namespace program
 {
     public class SmtpServer
     {
-        private TcpListener _listener;
+        private TcpListener _listener;  
         private bool _isRunning;
         public List<Email> emails = new List<Email>();
 
@@ -28,7 +28,7 @@ namespace program
                 //Esto evita aceptar una nueva conexión después de que el TcpListener haya sido detenido.
                 if (!_listener.Pending())
                 {
-                    Thread.Sleep(500); // Espera medio segundo antes de comprobar de nuevo
+                    Thread.Sleep(1500); // Espera medio segundo antes de comprobar de nuevo
                     continue;
                 }
                 var client = _listener.AcceptTcpClient();
@@ -86,8 +86,6 @@ namespace program
                         // Extrae la dirección de correo electrónico del comando
                         string email = line.Substring(5);
 
-                        // Verifica si la dirección de correo electrónico existe
-                        // NOTA: Esta es solo una simulación. Deberías implementar tu propia lógica de verificación aquí.
                         bool emailExists = VerifyEmail(email);
 
                         // Responde al cliente
