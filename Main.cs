@@ -1,4 +1,4 @@
-using NStack;
+﻿using NStack;
 using program;
 
 using System;
@@ -244,9 +244,9 @@ class Program
                 };
                 newWindow.Add(sendButton);
                 backButton.Clicked += () =>
-               {
-                   Application.RequestStop();
-               };
+                {
+                    Application.RequestStop();
+                };
                 // Hacer visible la nueva ventana
                 Application.Run(newWindow);
             }
@@ -288,6 +288,7 @@ class Program
                         }
                         catch (Exception)
                         {
+                            System.Console.WriteLine("Algo fallo");
                             MessageBox.Query(20, 7, "Error", "No se encontró ningún email para recibir", "Ok");
                         }
                     };
@@ -397,7 +398,7 @@ class Program
                                 var selectedLabel = radioLabels1[selectedIndex].ToString();
                                 string[] partes = selectedLabel!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                                 string subjectToFind = "";
-                                for (int i = 1; i < partes.Length - 3; i++)
+                                for (int i = 1; i < partes.Length - 4; i++)
                                 {
                                     subjectToFind += partes[i] + " ";
 
@@ -443,9 +444,9 @@ class Program
                     };
 
                     backButton.Clicked += () =>
-                  {
-                      Application.RequestStop();
-                  };
+                    {
+                        Application.RequestStop();
+                    };
                     Application.Run(newWindow);
                 }
                 else { MessageBox.Query(20, 7, "Error", "Necesita registrarse ", "Ok"); }
